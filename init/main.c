@@ -118,14 +118,112 @@ void init()
 	printf("[OK] Starting MXOS...\n");
 }
 
-void kmain()
-{
-	/* Initialize everything */
-	init();
+#define IDT_SIZE 256 // only 8 bit interrupts? what the fuck?
+#define KERNEL_CODE_SEGMENT_OFFSET 0x8
+#define IDT_INTERRUPT_GATE_32BIT 0x8e
+#define PIC1_COMMAND_PORT 0x20
+#define PIC1_DATA_PORT 0x21
+#define PIC2_COMMAND_PORT 0xA0
+#define PIC2_DATA_PORT 0xA1
+#define KEYBOARD_DATA_PORT 0x60
+#define KEYBOARD_STATUS_PORT 0x64 // hex minecraft stack of bits
 
+#include "../drivers/intel/intel_ps2keyboard/keyboard_map.h"
+
+extern void load_gdt();
+extern void keyboard_handler();
+extern char ioport_in(unsigned short port); // uint16_t port
+extern void ioport_out(unsigned short port, unsigned char data);
+extern void load_idt(unsigned int* idt_address);
+extern void enable_interrupts();
+
+struct IDT_pointer
+{
+	unsigned short limit;
+	unsigned int base;
+} __attribute__((packed));
+
+struct IDT_entry
+{
+	unsigned short offset_lowerbits;
+	unsigned short selector;
+	unsigned char zero; // reserved
+	unsigned char type_attr;
+	unsigned short offset_upperbits;
+} __attribute__((packed));
+
+struct IDT_entry IDT[IDT_SIZE]; // entire IDT
+int cursor_pos = 0;
+
+void init_idt()
+{
+	unsigned int offset = (unsigned int)keyboard_handler;
+	IDT[0x21].offset_lowerbits = offset & 0x0000FFFF;
+	IDT[0x21].selector = KERNEL_CODE_SEGMENT_OFFSET;
+	IDT[0x21].zero = 0; // reserved
+	IDT[0x21].type_attr = IDT_INTERRUPT_GATE_32BIT;
+	IDT[0x21].offset_upperbits = (offset & 0xFFFF0000) >> 16;
+	// ICW1
+	ioport_out(PIC1_COMMAND_PORT, 0x11);
+	ioport_out(PIC2_COMMAND_PORT, 0x11);
+	// ICW2
+	ioport_out(PIC1_DATA_PORT, 0x20);
+	ioport_out(PIC1_DATA_PORT, 0x28);
+	// ICW3
+	ioport_out(PIC1_DATA_PORT, 0x0);
+	ioport_out(PIC2_DATA_PORT, 0x0);
+	// ICW4
+	ioport_out(PIC1_DATA_PORT, 0x1);
+	ioport_out(PIC1_DATA_PORT, 0x1);
+	// Mask interrupts
+	ioport_out(PIC1_DATA_PORT, 0xff);
+	ioport_out(PIC1_DATA_PORT, 0xff);
+	// Load IDT Data Structure
+	struct IDT_pointer idt_ptr;
+	idt_ptr.limit = (sizeof(struct IDT_entry) * IDT_SIZE) - 1; // i dont know wtf im doing
+	idt_ptr.base = (unsigned int) &IDT;
+	load_idt(&idt_ptr);
+
+	printf("[OK] Initialized IDT\n");
+}
+
+void kb_init()
+{
+	ioport_out(PIC1_DATA_PORT, 0xFD);
+	printf("[OK] Initialized Intel PS2 Keyboard\n");
+}
+
+void handle_keyboard_interrupt()
+{
+	ioport_out(PIC1_COMMAND_PORT, 0x20);
+	unsigned char status = ioport_in(KEYBOARD_STATUS_PORT);
+	if(status & 0x1)
+	{
+		char keycode = ioport_in(KEYBOARD_DATA_PORT);
+		if(keycode < 0 || keycode >= 128) return;
+		//terminal_putchar(keyboard_map[keycode]);
+		terminal_putentryat(keyboard_map[keycode], terminal_color, cursor_pos, 10);
+		cursor_pos++;
+	}
+}
+
+void welcome()
+{
 	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
 
 	printf("Welcome to ViaOS 1.0.0\n");
 	printf("KERNEL VERSION 0.1\n");
 	printf("Copyright 2024 Via\n");
+}
+
+void kmain()
+{
+	/* Initialize everything */
+	init();
+	init_idt();
+	kb_init();
+	welcome();
+	enable_interrupts();
+
+	while(1);
 }
