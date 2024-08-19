@@ -1,4 +1,4 @@
-// MXOS -- Minimal X86 Operating System
+// ViaOS
 // Kernel
 // GNU GPL 3.0 License, Read LICENSE.TXT
 
@@ -87,6 +87,8 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 	// terminal_column = x;
 }
 
+void set_cursor_position(size_t row, size_t column);
+
 void terminal_putchar(char c) 
 {
 	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
@@ -95,6 +97,8 @@ void terminal_putchar(char c)
 		if (++terminal_row == VGA_HEIGHT)
 			terminal_row = 0;
 	}
+
+	set_cursor_position(terminal_row, terminal_column);
 }
 
 void terminal_write(const char* data, size_t size) 
@@ -118,7 +122,7 @@ void init()
 	printf("[OK] Starting MXOS...\n");
 }
 
-#define IDT_SIZE 256 // only 8 bit interrupts? what the fuck?
+#define IDT_SIZE 256 // only 8 bit of interrupts? what the fuck?
 #define KERNEL_CODE_SEGMENT_OFFSET 0x8
 #define IDT_INTERRUPT_GATE_32BIT 0x8e
 #define PIC1_COMMAND_PORT 0x20
@@ -151,6 +155,28 @@ struct IDT_entry
 	unsigned char type_attr;
 	unsigned short offset_upperbits;
 } __attribute__((packed));
+
+#define VGA_CONTROL_PORT 0x3D4
+#define VGA_DATA_PORT 0x3D5
+
+// Define indices for the VGA registers
+#define CURSOR_HIGH_BYTE 0x0E
+#define CURSOR_LOW_BYTE 0x0F
+
+void set_cursor_position(size_t row, size_t column) 
+{
+    // Calculate the cursor position in VGA memory
+    uint16_t position = row * VGA_WIDTH + column;
+    
+    // Send the high byte of the cursor position to the VGA control port
+    ioport_out(VGA_CONTROL_PORT, CURSOR_HIGH_BYTE);
+    ioport_out(VGA_DATA_PORT, (uint8_t)(position >> 8)); // High byte
+
+    // Send the low byte of the cursor position to the VGA control port
+    ioport_out(VGA_CONTROL_PORT, CURSOR_LOW_BYTE);
+    ioport_out(VGA_DATA_PORT, (uint8_t)(position & 0xFF)); // Low byte
+}
+
 
 struct IDT_entry IDT[IDT_SIZE]; // entire IDT
 int cursor_pos = 0;
@@ -193,27 +219,117 @@ void kb_init()
 	printf("[OK] Initialized Intel PS2 Keyboard\n");
 }
 
+// Area for command functionalities
+void help_menu()
+{
+	printf("\nWelcome to ViaOS!\n");
+	printf("\nhelp - Print out functionalities/commands existing of the operating system\n");
+	printf("hi - Print out a sweet hello!\n");
+	printf("ld - List Directory, print out files of current dir.\n");
+
+	printf("> ");
+}
+
+void list_dir()
+{
+	terminal_setcolor(vga_entry_color(VGA_COLOR_RED, VGA_COLOR_BLACK));
+	printf("\n[ERROR] ");
+	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+	printf("Unimplemented RIFS\n");
+
+	printf("> ");
+}
+
+#define BUFFER_SIZE 128
+
+static char input_buffer[BUFFER_SIZE];
+static size_t buffer_pos = 0;
+
 void handle_keyboard_interrupt()
 {
-	ioport_out(PIC1_COMMAND_PORT, 0x20);
-	unsigned char status = ioport_in(KEYBOARD_STATUS_PORT);
-	if(status & 0x1)
-	{
-		char keycode = ioport_in(KEYBOARD_DATA_PORT);
-		if(keycode < 0 || keycode >= 128) return;
-		//terminal_putchar(keyboard_map[keycode]);
-		terminal_putentryat(keyboard_map[keycode], terminal_color, cursor_pos, 10);
-		cursor_pos++;
-	}
+    ioport_out(PIC1_COMMAND_PORT, 0x20);
+    unsigned char status = ioport_in(KEYBOARD_STATUS_PORT);
+
+    if (status & 0x1)
+    {
+        char keycode = ioport_in(KEYBOARD_DATA_PORT);
+
+        // Check for valid keycode
+        if (keycode < 0 || keycode >= 128) return;
+
+        // Map the keycode to a character
+        char ch = keyboard_map[keycode];
+        
+        // Handle backspace
+        if (ch == 0x08) // Backspace keycode
+        {
+            if (buffer_pos > 0)
+            {
+                buffer_pos--;
+                terminal_putchar('\b'); // Display backspace
+                terminal_putchar(' '); // Clear the last character
+                terminal_putchar('\b'); // Move cursor back
+            }
+            return;
+        }
+
+        // Append character to buffer
+        if (buffer_pos < BUFFER_SIZE - 1 && ch != '\0')
+        {
+            input_buffer[buffer_pos++] = ch;
+            input_buffer[buffer_pos] = '\0'; // Null-terminate the string
+
+            // Print character to terminal
+            terminal_putchar(ch);
+
+            if(ch == '\n')
+            {
+            	printf("> ");
+            }
+
+            // Commandline
+            if (buffer_pos >= 3 &&
+            	input_buffer[buffer_pos - 3] == 'h' &&
+            	input_buffer[buffer_pos - 2] == 'i' &&
+            	input_buffer[buffer_pos - 1] == '\n')
+            {
+                printf("\nHello!\n");
+                printf("> ");
+                buffer_pos -= 2; // Adjust buffer position to account for replacement
+            }
+
+            if (buffer_pos >= 5 &&
+            	input_buffer[buffer_pos - 5] == 'h' &&
+            	input_buffer[buffer_pos - 4] == 'e' &&
+            	input_buffer[buffer_pos - 3] == 'l' &&
+            	input_buffer[buffer_pos - 2] == 'p' &&
+            	input_buffer[buffer_pos - 1] == '\n')
+            {
+                help_menu();
+                buffer_pos -= 2; // Adjust buffer position to account for replacement
+            }
+
+            if (buffer_pos >= 3 &&
+            	input_buffer[buffer_pos - 3] == 'l' &&
+            	input_buffer[buffer_pos - 2] == 'd' &&
+            	input_buffer[buffer_pos - 1] == '\n')
+            {
+                list_dir();
+                buffer_pos -= 2; // Adjust buffer position to account for replacement
+            }
+        }
+    }
 }
+
 
 void welcome()
 {
 	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
 
 	printf("Welcome to ViaOS 1.0.0\n");
-	printf("KERNEL VERSION 0.1\n");
+	printf("KERNEL VERSION 0.3\n");
 	printf("Copyright 2024 Via\n");
+	printf("> ");
 }
 
 void kmain()
