@@ -1,5 +1,5 @@
 # ViaOS
-An x86 Operating System built on the MX Kernel by Via.
+An x86 Operating System built on the VD Kernel (VDK) by Via.
 
 # Complile
 > cd ViaOS
