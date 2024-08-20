@@ -37,6 +37,7 @@ section .text
     global ioport_in
     global ioport_out
     global enable_interrupts
+    global disable_interrupts
 
 	extern kmain
 	extern handle_keyboard_interrupt
@@ -53,6 +54,10 @@ load_idt:
 
 enable_interrupts:
 	sti
+	ret
+
+disable_interrupts:
+	cli
 	ret
 
 keyboard_handler:

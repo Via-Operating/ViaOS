@@ -1,3 +1,7 @@
+// ViaOS
+// Kernel
+// GNU GPL 3.0 License, Read LICENSE.TXT
+
 #ifndef __KEYBOARD_MAP_H
 #define __KEYBOARD_MAP_H
 

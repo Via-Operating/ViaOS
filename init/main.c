@@ -2,28 +2,49 @@
 // Kernel
 // GNU GPL 3.0 License, Read LICENSE.TXT
 
-#include "types.h"
+#include <via/stdio.h>
+#include <via/shell/term/bash/echo.h>
+#include <via/shell/term/bash/help.h>
+#include <via/shell/term/bash/hi.h>
+#include <via/shell/term/bash/ld.h>
+#include <via/shell/term/bash/shutdown.h>
+#include <via/via.h>
 
-/* Hardware text mode color constants. */
-enum vga_color 
+enum BOOL_T poweroff_sys = FALSE;
+
+enum BOOL_T strncmp(const char *str1, const char *str2, size_t n) 
 {
-	VGA_COLOR_BLACK = 0,
-	VGA_COLOR_BLUE = 1,
-	VGA_COLOR_GREEN = 2,
-	VGA_COLOR_CYAN = 3,
-	VGA_COLOR_RED = 4,
-	VGA_COLOR_MAGENTA = 5,
-	VGA_COLOR_BROWN = 6,
-	VGA_COLOR_LIGHT_GREY = 7,
-	VGA_COLOR_DARK_GREY = 8,
-	VGA_COLOR_LIGHT_BLUE = 9,
-	VGA_COLOR_LIGHT_GREEN = 10,
-	VGA_COLOR_LIGHT_CYAN = 11,
-	VGA_COLOR_LIGHT_RED = 12,
-	VGA_COLOR_LIGHT_MAGENTA = 13,
-	VGA_COLOR_LIGHT_BROWN = 14,
-	VGA_COLOR_WHITE = 15,
-};
+    // Compare up to n characters or until a null terminator is encountered
+    while (n > 0 && *str1 && *str2) {
+        if (*str1 != *str2) {
+        	if((unsigned char)*str1 - (unsigned char)*str2)
+        	{
+        		return TRUE;
+        	}
+        	else
+        	{
+        		return FALSE;
+        	}
+        }
+        str1++;
+        str2++;
+        n--;
+    }
+
+    // If we've compared all n characters, or reached a null terminator
+    if (n == 0) {
+        return FALSE; // Strings are equal up to n characters
+    }
+    // If we reach here, it means n > 0 and either of the strings has ended
+    if((unsigned char)*str1 - (unsigned char)*str2)
+    {
+		return TRUE;
+    }
+	else
+	{
+		return FALSE;
+	}
+}
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) 
 {
@@ -119,7 +140,6 @@ void init()
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
 
 	printf(" [OK] Initialize Console\n");
-	printf("[OK] Starting MXOS...\n");
 }
 
 #define IDT_SIZE 256 // only 8 bit of interrupts? what the fuck?
@@ -140,6 +160,7 @@ extern char ioport_in(unsigned short port); // uint16_t port
 extern void ioport_out(unsigned short port, unsigned char data);
 extern void load_idt(unsigned int* idt_address);
 extern void enable_interrupts();
+extern void disable_interrupts();
 
 struct IDT_pointer
 {
@@ -219,24 +240,12 @@ void kb_init()
 	printf("[OK] Initialized Intel PS2 Keyboard\n");
 }
 
-// Area for command functionalities
-void help_menu()
+void whoami()
 {
-	printf("\nWelcome to ViaOS!\n");
-	printf("\nhelp - Print out functionalities/commands existing of the operating system\n");
-	printf("hi - Print out a sweet hello!\n");
-	printf("ld - List Directory, print out files of current dir.\n");
+	terminal_setcolor(vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
+	printf("\nadmin\n");
 
-	printf("> ");
-}
-
-void list_dir()
-{
-	terminal_setcolor(vga_entry_color(VGA_COLOR_RED, VGA_COLOR_BLACK));
-	printf("\n[ERROR] ");
 	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-	printf("Unimplemented RIFS\n");
-
 	printf("> ");
 }
 
@@ -247,6 +256,11 @@ static size_t buffer_pos = 0;
 
 void handle_keyboard_interrupt()
 {
+	if(poweroff_sys == TRUE)
+	{
+		return;
+	}
+
     ioport_out(PIC1_COMMAND_PORT, 0x20);
     unsigned char status = ioport_in(KEYBOARD_STATUS_PORT);
 
@@ -293,8 +307,7 @@ void handle_keyboard_interrupt()
             	input_buffer[buffer_pos - 2] == 'i' &&
             	input_buffer[buffer_pos - 1] == '\n')
             {
-                printf("\nHello!\n");
-                printf("> ");
+                hello();
                 buffer_pos -= 2; // Adjust buffer position to account for replacement
             }
 
@@ -317,6 +330,37 @@ void handle_keyboard_interrupt()
                 list_dir();
                 buffer_pos -= 2; // Adjust buffer position to account for replacement
             }
+
+            if (buffer_pos >= 7 &&
+            	input_buffer[buffer_pos - 7] == 'w' &&
+            	input_buffer[buffer_pos - 6] == 'h' &&
+            	input_buffer[buffer_pos - 5] == 'o' &&
+            	input_buffer[buffer_pos - 4] == 'a' &&
+            	input_buffer[buffer_pos - 3] == 'm' &&
+            	input_buffer[buffer_pos - 2] == 'i' &&
+            	input_buffer[buffer_pos - 1] == '\n')
+            {
+                whoami();
+                buffer_pos -= 2; // Adjust buffer position to account for replacement
+            }
+
+            if (buffer_pos >= 9 &&
+            	input_buffer[buffer_pos - 9] == 's' &&
+            	input_buffer[buffer_pos - 8] == 'h' &&
+            	input_buffer[buffer_pos - 7] == 'u' &&
+            	input_buffer[buffer_pos - 6] == 't' &&
+            	input_buffer[buffer_pos - 5] == 'd' &&
+            	input_buffer[buffer_pos - 4] == 'o' &&
+            	input_buffer[buffer_pos - 3] == 'w' &&
+            	input_buffer[buffer_pos - 2] == 'n' &&
+            	input_buffer[buffer_pos - 1] == '\n')
+            {
+                shutdown();
+                disable_interrupts();
+                poweroff_sys = TRUE;
+                buffer_pos -= 2; // Adjust buffer position to account for replacement
+                return;
+            }
         }
     }
 }
@@ -324,10 +368,13 @@ void handle_keyboard_interrupt()
 
 void welcome()
 {
+	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK))
+	printf("[OK] Starting VDK...\n");
+
 	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
 
 	printf("Welcome to ViaOS 1.0.0\n");
-	printf("KERNEL VERSION 0.3\n");
+	printf("KERNEL VERSION 0.5\n");
 	printf("Copyright 2024 Via\n");
 	printf("> ");
 }
