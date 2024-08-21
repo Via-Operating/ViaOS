@@ -7,6 +7,8 @@
 #include <via/shell/term/bash/help.h>
 #include <via/shell/term/bash/hi.h>
 #include <via/shell/term/bash/ld.h>
+#include <via/shell/term/bash/cd.h>
+#include <via/shell/term/bash/info.h>
 #include <via/shell/term/bash/shutdown.h>
 #include <via/via.h>
 
@@ -110,17 +112,48 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 
 void set_cursor_position(size_t row, size_t column);
 
+void terminal_scroll(void) 
+{
+    // Move all rows up by one
+    for (size_t y = 0; y < VGA_HEIGHT - 1; y++) {
+        for (size_t x = 0; x < VGA_WIDTH; x++) {
+            const size_t current_index = y * VGA_WIDTH + x;
+            const size_t next_index = (y + 1) * VGA_WIDTH + x;
+            terminal_buffer[current_index] = terminal_buffer[next_index];
+        }
+    }
+
+    // Clear the last line
+    const size_t last_row = VGA_HEIGHT - 1;
+    for (size_t x = 0; x < VGA_WIDTH; x++) {
+        const size_t index = last_row * VGA_WIDTH + x;
+        terminal_buffer[index] = vga_entry(' ', terminal_color);
+    }
+}
+
 void terminal_putchar(char c) 
 {
-	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-	if (++terminal_column == VGA_WIDTH) {
-		terminal_column = 0;
-		if (++terminal_row == VGA_HEIGHT)
-			terminal_row = 0;
-	}
+    if (c == '\n') {
+        terminal_row++;
+        terminal_column = 0;
+        if (terminal_row >= VGA_HEIGHT) {
+            terminal_row = VGA_HEIGHT - 1; // keep at bottom row
+            terminal_scroll();
+        }
+    } else {
+        terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+        if (++terminal_column == VGA_WIDTH) {
+            terminal_column = 0;
+            if (++terminal_row >= VGA_HEIGHT) {
+                terminal_row = VGA_HEIGHT - 1; // keep at bottom row
+                terminal_scroll();
+            }
+        }
+    }
 
-	set_cursor_position(terminal_row, terminal_column);
+    set_cursor_position(terminal_row, terminal_column);
 }
+
 
 void terminal_write(const char* data, size_t size) 
 {
@@ -139,7 +172,7 @@ void init()
 
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
 
-	printf(" [OK] Initialize Console\n");
+	printf("[OK] Initialize Console\n");
 }
 
 #define IDT_SIZE 256 // only 8 bit of interrupts? what the fuck?
@@ -312,6 +345,17 @@ void handle_keyboard_interrupt()
             }
 
             if (buffer_pos >= 5 &&
+                input_buffer[buffer_pos - 5] == 'i' &&
+                input_buffer[buffer_pos - 4] == 'n' &&
+                input_buffer[buffer_pos - 3] == 'f' &&
+                input_buffer[buffer_pos - 2] == 'o' &&
+                input_buffer[buffer_pos - 1] == '\n')
+            {
+                info();
+                buffer_pos -= 2; // Adjust buffer position to account for replacement
+            }
+
+            if (buffer_pos >= 5 &&
             	input_buffer[buffer_pos - 5] == 'h' &&
             	input_buffer[buffer_pos - 4] == 'e' &&
             	input_buffer[buffer_pos - 3] == 'l' &&
@@ -331,32 +375,6 @@ void handle_keyboard_interrupt()
                 buffer_pos -= 2; // Adjust buffer position to account for replacement
             }
 
-		if (buffer_pos >= 8 &&
-            	input_buffer[buffer_pos - 8] == 'c' &&
-            	input_buffer[buffer_pos - 7] == 'r' &&
-            	input_buffer[buffer_pos - 6] == 'e' &&
-            	input_buffer[buffer_pos - 5] == 'd' &&
-            	input_buffer[buffer_pos - 4] == 'i' &&
-            	input_buffer[buffer_pos - 3] == 't' &&
-            	input_buffer[buffer_pos - 2] == 's' &&
-            	input_buffer[buffer_pos - 1] == '\n'
-            {
-                
-		terminal_setcolor(vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
-
-
-		printf("\n\n");
-		printf(" Via Operating System\n");
-		printf("--------------------\n\n");
-
-		printf(" Main Developer/Founder : Bradinator\n");
-		printf(" Co-Founder             : Kap Petrov\n");
-		printf(" Developers             : ALocalDeveloper, Vincent392, vrified-stupd\n");
-
-		buffer_pos -= 7;
-
-            }
-		
             if (buffer_pos >= 7 &&
             	input_buffer[buffer_pos - 7] == 'w' &&
             	input_buffer[buffer_pos - 6] == 'h' &&
@@ -387,6 +405,15 @@ void handle_keyboard_interrupt()
                 buffer_pos -= 2; // Adjust buffer position to account for replacement
                 return;
             }
+
+            if (buffer_pos >= 3 &&
+                input_buffer[buffer_pos - 3] == 'c' &&
+                input_buffer[buffer_pos - 2] == 'd' &&
+                input_buffer[buffer_pos - 1] == '\n')
+            {
+                VDKChangeDir("VIPERRRRRRRRRRRRRRRRRRR MY GUYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY HOW ARE YOU?");
+                buffer_pos -= 2; // Adjust buffer position to account for replacement
+            }
         }
     }
 }
@@ -394,7 +421,7 @@ void handle_keyboard_interrupt()
 
 void welcome()
 {
-	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK))
+	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
 	printf("[OK] Starting VDK...\n");
 
 	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
