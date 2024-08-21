@@ -1,3 +1,8 @@
+## - Brad
+
+please can everyone be nice to me, i started this project in high school as a hobby, not where everyone is killing me about rifs? Just click [here](https://github.com/Via-Operating/RIFS). There's rifs, stop hurting me please
+
+
 ## - Theo
 
 so uhm, viaSh isn't done yet, viaSh.h still needs work. If you have any notes, please place them here so that we know what to do. thanks :)
