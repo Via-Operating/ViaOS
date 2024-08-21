@@ -1,7 +1,21 @@
 # ViaOS
-An x86 Operating System built on the Via Dynamic Kernel (VDK) by The Via Opearting Project. Via is designed for an open-sourced, free non-profit operating system designed for developers and casual use.
+An x86 Operating System built on the Via Dynamic Kernel (VDK) by The Via Operating Project. Via is designed for an open-sourced, free non-profit operating system designed for developers and casual use.
 
-### Howto compile
-on Linux, download several packages, and then `git clone` this, `cd` into the directory and run
-`make iso`
-on Windows, WSL2 and follow the Linux steps... or MSYS2 if that works.
+## How to compile
+### Linux
+``` sudo apt install build-essential gcc g++ ```
+
+``` git clone https://github.com/Via-Operating/ViaOS/ ```
+
+``` cd ViaOS ```
+
+``` sudo make && sudo make iso ```
+
+### Windows
+Use WSL and follow the steps for linux.
+
+### MacOS
+Pretty much same as linux, use homebrew.
+
+### ViaOS
+It doesn't have a toolchain or GNU-Binutils. Yet.
