@@ -426,7 +426,7 @@ void welcome()
 
 	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
 
-	printf("Welcome to ViaOS 1.0.0\n");
+	printf("Welcome to ViaOS 0.3.0\n");
 	printf("KERNEL VERSION 0.5\n");
 	printf("Copyright 2024 Via\n");
 	printf("> ");
