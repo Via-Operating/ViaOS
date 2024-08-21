@@ -331,6 +331,32 @@ void handle_keyboard_interrupt()
                 buffer_pos -= 2; // Adjust buffer position to account for replacement
             }
 
+		if (buffer_pos >= 8 &&
+            	input_buffer[buffer_pos - 8] == 'c' &&
+            	input_buffer[buffer_pos - 7] == 'r' &&
+            	input_buffer[buffer_pos - 6] == 'e' &&
+            	input_buffer[buffer_pos - 5] == 'd' &&
+            	input_buffer[buffer_pos - 4] == 'i' &&
+            	input_buffer[buffer_pos - 3] == 't' &&
+            	input_buffer[buffer_pos - 2] == 's' &&
+            	input_buffer[buffer_pos - 1] == '\n'
+            {
+                
+		terminal_setcolor(vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
+
+
+		printf("\n\n");
+		printf(" Via Operating System\n");
+		printf("--------------------\n\n");
+
+		printf(" Main Developer/Founder : Bradinator\n");
+		printf(" Co-Founder             : Kap Petrov\n");
+		printf(" Developers             : ALocalDeveloper, Vincent392, vrified-stupd\n");
+
+		buffer_pos -= 7;
+
+            }
+		
             if (buffer_pos >= 7 &&
             	input_buffer[buffer_pos - 7] == 'w' &&
             	input_buffer[buffer_pos - 6] == 'h' &&
