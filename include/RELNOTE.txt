@@ -1,0 +1,27 @@
+	VDK release 0.2
+
+These are the release notes for VDK version 0.2.  Read them carefully,
+as they tell you what this is all about, explain how to install the
+kernel, and what to do if something goes wrong. 
+
+WHAT IS VDK?
+
+  VDK is a modern kernel for ViaOS written from scratch by
+  Kap Petrov with assistance from Brad and a loosely-knit team of OSDEVers
+  across the internet.  It aims towards simplicity and usability. 
+
+  It is distributed under the GNU General Public License - see the
+  accompanying LICENSE file for more details. 
+
+INSTALLING the kernel:
+
+ - make sure you have all the dependencies such as NASM, QEMU, etc.
+
+COMPILING the kernel:
+
+ - make sure you have gcc.  It seems older gcc
+   versions can have problems compiling newer versions of VDK. If you
+   upgrade your compiler, remember to get the new binutils package too
+   (for as/ld/nm and company)
+
+ - do a "make" to create a kernel image without grub.
