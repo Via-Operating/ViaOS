@@ -34,6 +34,7 @@ section .text
     global load_gdt
     global load_idt
     global keyboard_handler
+    global ata_handler
     global ioport_in
     global ioport_out
     global enable_interrupts
@@ -41,6 +42,7 @@ section .text
 
 	extern kmain
 	extern handle_keyboard_interrupt
+	extern ide_irq
 
 ; load Global Descriptor Table
 load_gdt:
@@ -64,6 +66,13 @@ keyboard_handler:
 	pushad ; push ads to the stack lmfao
 	cld
 	call handle_keyboard_interrupt
+	popad
+	iret ; if this doesnt work, use iretd instead
+
+ata_handler:
+	pushad ; push ads to the stack lmfao
+	cld
+	call ide_irq
 	popad
 	iret ; if this doesnt work, use iretd instead
 

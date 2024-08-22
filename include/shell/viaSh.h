@@ -1,3 +1,2 @@
-#include "commands.h"
-
-// Kap, Transfer the terminal here, also you can  just include 'commands.h' in the main.c instead of calling each command :)
+/* Not being used for now, don't delete though!
+This file is gonna be used to replace the console in the kernel file (If Kap approves)*/

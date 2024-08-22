@@ -24,6 +24,12 @@ enum vga_color
 	VGA_COLOR_WHITE = 15,
 };
 
+int strcmp(const char *s1, char *s2);
+int strcpy(char *dst, const char *src);
+
+extern char ioport_in(unsigned short port); // uint16_t port
+extern void ioport_out(unsigned short port, unsigned char data);
+
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg);
 
 static inline uint16_t vga_entry(unsigned char uc, uint8_t color);
@@ -43,5 +49,7 @@ void terminal_putchar(char c);
 void terminal_write(const char* data, size_t size);
 
 void printf(const char* data);
+
+void idt_set_entry(int index, uint32_t base, uint8_t flags);
 
 #endif

@@ -12,6 +12,23 @@
 #include <via/shell/term/bash/shutdown.h>
 #include <via/via.h>
 
+int strcmp(const char *s1, char *s2) {
+    int i = 0;
+
+    while ((s1[i] == s2[i])) {
+        if (s2[i++] == 0)
+            return 0;
+    }
+    return 1;
+}
+
+int strcpy(char *dst, const char *src) {
+    int i = 0;
+    while ((*dst++ = *src++) != 0)
+        i++;
+    return i;
+}
+
 enum BOOL_T poweroff_sys = FALSE;
 
 enum BOOL_T strncmp(const char *str1, const char *str2, size_t n) 
@@ -186,11 +203,11 @@ void init()
 #define KEYBOARD_STATUS_PORT 0x64 // hex minecraft stack of bits
 
 #include "../drivers/intel/intel_ps2keyboard/keyboard_map.h"
+#include "../drivers/independent/disk/ata/IDE.h"
 
 extern void load_gdt();
 extern void keyboard_handler();
-extern char ioport_in(unsigned short port); // uint16_t port
-extern void ioport_out(unsigned short port, unsigned char data);
+extern void ata_handler();
 extern void load_idt(unsigned int* idt_address);
 extern void enable_interrupts();
 extern void disable_interrupts();
@@ -235,14 +252,27 @@ void set_cursor_position(size_t row, size_t column)
 struct IDT_entry IDT[IDT_SIZE]; // entire IDT
 int cursor_pos = 0;
 
+void idt_set_entry(int index, uint32_t base, uint8_t flags)
+{
+    IDT[index].offset_lowerbits = base & 0x0000FFFF;
+    IDT[index].selector = KERNEL_CODE_SEGMENT_OFFSET;
+    IDT[index].zero = 0; // reserved
+    IDT[index].type_attr = flags | 0x60;
+    IDT[index].offset_upperbits = (base & 0xFFFF0000) >> 16;
+}
+
 void init_idt()
 {
-	unsigned int offset = (unsigned int)keyboard_handler;
-	IDT[0x21].offset_lowerbits = offset & 0x0000FFFF;
-	IDT[0x21].selector = KERNEL_CODE_SEGMENT_OFFSET;
-	IDT[0x21].zero = 0; // reserved
-	IDT[0x21].type_attr = IDT_INTERRUPT_GATE_32BIT;
-	IDT[0x21].offset_upperbits = (offset & 0xFFFF0000) >> 16;
+	// unsigned int offset = (unsigned int)keyboard_handler;
+	// IDT[0x21].offset_lowerbits = offset & 0x0000FFFF;
+	// IDT[0x21].selector = KERNEL_CODE_SEGMENT_OFFSET;
+	// IDT[0x21].zero = 0; // reserved
+	// IDT[0x21].type_attr = IDT_INTERRUPT_GATE_32BIT;
+	// IDT[0x21].offset_upperbits = (offset & 0xFFFF0000) >> 16;
+
+    idt_set_entry(33, (unsigned int)keyboard_handler, IDT_INTERRUPT_GATE_32BIT);
+    idt_set_entry(46, (unsigned int)ata_handler, IDT_INTERRUPT_GATE_32BIT);
+
 	// ICW1
 	ioport_out(PIC1_COMMAND_PORT, 0x11);
 	ioport_out(PIC2_COMMAND_PORT, 0x11);
@@ -426,10 +456,35 @@ void welcome()
 
 	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
 
-	printf("Welcome to ViaOS 0.3.0\n");
+	printf("Welcome to ViaOS 1.0.0\n");
 	printf("KERNEL VERSION 0.5\n");
 	printf("Copyright 2024 Via\n");
 	printf("> ");
+}
+
+void *memset(void *dst, char c, uint32_t n) {
+    char *temp = dst;
+    for (; n != 0; n--) *temp++ = c;
+    return dst;
+}
+
+void *memcpy(void *dst, const void *src, uint32_t n) {
+    char *ret = dst;
+    char *p = dst;
+    const char *q = src;
+    while (n--)
+        *p++ = *q++;
+    return ret;
+}
+
+int memcmp(uint8_t *s1, uint8_t *s2, uint32_t n) {
+    while (n--) {
+        if (*s1 != *s2)
+            return 0;
+        s1++;
+        s2++;
+    }
+    return 1;
 }
 
 void kmain()
@@ -438,8 +493,47 @@ void kmain()
 	init();
 	init_idt();
 	kb_init();
+    ata_init();
 	welcome();
 	enable_interrupts();
+
+    printf("\nExample\n");
+    const int DRIVE = ata_get_drive_by_model("QEMU HARDDISK");
+    const uint32_t LBA = 0;
+    const uint8_t NO_OF_SECTORS = 1;
+    char buf[ATA_SECTOR_SIZE] = {0};
+
+    struct example {
+        int id;
+        char name[32];
+    };
+
+    struct example e;
+    e.id = 10012;
+    strcpy(e.name, "Iron Man");
+
+    // write message to drive
+    strcpy(buf, "Hello World");
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA, (uint32_t)buf);
+
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, &e, sizeof(e));
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+    printf("data written\n");
+
+    // read message from drive
+    memset(buf, 0, sizeof(buf));
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA, (uint32_t)buf);
+    printf("read data: ");
+
+    printf(buf);
+
+    printf("\n");
+
+    memset(buf, 0, sizeof(buf));
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+    memcpy(&e, buf, sizeof(e));
+    //printf("id: %d, name: %s\n", e.id, e.name);
 
 	while(1);
 }
