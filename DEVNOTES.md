@@ -14,7 +14,7 @@ so uhm, viaSh isn't done yet, viaSh.h still needs work. and we can work on the S
 ## - Kap
 i fucking hate everybody.
 
-Jokes aside: BRAD WE NEED THE FUCKING RIFS! I'm going to write the ATA driver, anybody have a problem with that? yes? fuck you. no? alright.
+Jokes aside: ATA Driver DONE! i just need the RIFS implemented now. also don't worry Brad!
 
 ## - Vincent
 [MASTER OF PUPPETS](https://open.spotify.com/track/2MuWTIM3b0YEAskbeeFE1i?si=POP0gB4nSY-stbqPH6Yt4w), I'M PULLING YOUR STRINGS!
