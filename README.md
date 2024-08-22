@@ -21,3 +21,6 @@ Pretty much same as linux, use homebrew.
 
 ### ViaOS
 It doesn't have a toolchain or GNU-Binutils. Yet.
+
+## Run
+```qemu-system-i386 -drive file=via.iso,media=disk,format=raw```
