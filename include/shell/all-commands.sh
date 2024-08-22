@@ -6,6 +6,6 @@ echo "#ifndef __ALL_HEADERS__" >> $HEADER
 echo "#define __ALL_HEADERS__" >> $HEADER
 for file in term/viaSh/*.h
 do
-    echo "#include <$file>" >> $HEADER
+    echo "#include <via/shell/$file>" >> $HEADER
 done
 echo "#endif" >> $HEADER
