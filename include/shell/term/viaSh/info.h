@@ -94,21 +94,8 @@ void info()
         printf(idkwhyweneedthis);
         printf("\n");
     }
-    else if (ageOfUser >= 9999999999 && !(ageOfUser >= 13772000000))
+    else if (ageOfUser >= 9999999999)
     {
         printf("Yahaha! You found me!\n");
-    }
-    //Added by Vincent392
-    else if (ageOfUser >= 13772000000 && !(ageOfUser >= 13772000001))
-    {
-        printf("You're as old as the universe, how?\n");
-    }
-    else if (ageOfUser >= 13772000001 && !(ageOfUser >= 999999999999)) 
-    {
-        printf("You're older than the Universe! congratulations!\n");
-    }
-    else if (ageOfUser >= 999999999999))
-    {
-        printf("MASTER OF PUPPETS, I'M PULLING YOUR STRINGS!\n");
     }
 }
