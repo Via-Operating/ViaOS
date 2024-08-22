@@ -14,7 +14,7 @@ im gonna fucking kms if i see the bash folder again
 ## - Kap
 i fucking hate everybody.
 
-Jokes aside: ATA Driver DONE! i just need the RIFS implemented now. also don't worry Brad!
+Jokes aside: RIFS Implemented, RIFS apparently doesn't have folders yet, so I can't implement cd. Once that's done, RIFS completely completeeee! Also, theo, imma create the bash folder again.
 
 ## - Vincent
 [MASTER OF PUPPETS](https://open.spotify.com/track/2MuWTIM3b0YEAskbeeFE1i?si=POP0gB4nSY-stbqPH6Yt4w), I'M PULLING YOUR STRINGS!
