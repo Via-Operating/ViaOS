@@ -24,6 +24,30 @@ enum vga_color
 	VGA_COLOR_WHITE = 15,
 };
 
+	typedef struct
+    {
+        int hours;
+        int mins;
+        int secs;
+    } time_t;
+
+    typedef struct
+    {
+        int ro; // read only
+        int wo; // write only
+        int sys; // system file
+    } perm_t;
+
+    struct RIFS_File
+    {
+        int id;
+        perm_t permissions;
+        time_t time_created;
+        time_t time_modified;
+        time_t time_accessed;
+        char name[32];
+    };
+
 int strcmp(const char *s1, char *s2);
 int strcpy(char *dst, const char *src);
 
@@ -51,5 +75,8 @@ void terminal_write(const char* data, size_t size);
 void printf(const char* data);
 
 void idt_set_entry(int index, uint32_t base, uint8_t flags);
+
+void VDK_InterpretFile(struct RIFS_File e);
+void VDK_ViewFile(struct RIFS_File e, char* data);
 
 #endif

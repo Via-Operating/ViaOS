@@ -12,6 +12,11 @@
 #include <via/shell/term/bash/shutdown.h>
 #include <via/via.h>
 
+#define MAX_FILENAME 255
+#define MAX_FILES 255
+
+struct RIFS_File all_files[MAX_FILES] = {0};
+
 int strcmp(const char *s1, char *s2) {
     int i = 0;
 
@@ -401,7 +406,7 @@ void handle_keyboard_interrupt()
             	input_buffer[buffer_pos - 2] == 'd' &&
             	input_buffer[buffer_pos - 1] == '\n')
             {
-                list_dir();
+                list_dir(all_files);
                 buffer_pos -= 2; // Adjust buffer position to account for replacement
             }
 
@@ -487,6 +492,120 @@ int memcmp(uint8_t *s1, uint8_t *s2, uint32_t n) {
     return 1;
 }
 
+void strcat(char *dest, const char *src) {
+    char *end = (char *)dest + strlen(dest);
+    memcpy((void *)end, (void *)src, strlen(src));
+    end = end + strlen(src);
+    *end = '\0';
+}
+
+void itoa(int num, char* str, int base) {
+    int i = 0;
+    int is_negative = 0;
+
+    // Handle 0 explicitly
+    if (num == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return;
+    }
+
+    // Handle negative numbers only if base is 10
+    if (num < 0 && base == 10) {
+        is_negative = 1;
+        num = -num;
+    }
+
+    // Process individual digits
+    while (num != 0) {
+        int rem = num % base;
+        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        num = num / base;
+    }
+
+    // Append negative sign for negative numbers
+    if (is_negative) {
+        str[i++] = '-';
+    }
+
+    str[i] = '\0'; // Null-terminate string
+
+    // Reverse the string
+    int start = 0;
+    int end = i - 1;
+    while (start < end) {
+        char temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+        start++;
+        end--;
+    }
+}
+
+void VDK_InterpretFile(struct RIFS_File e)
+{
+    char idSh[MAX_FILENAME];
+    char timeCreatedH[MAX_FILENAME];
+    char timeCreatedS[MAX_FILENAME];
+    char timeCreatedM[MAX_FILENAME];
+
+    itoa(e.id, idSh, 10);
+    itoa(e.time_created.hours, timeCreatedH, 10);
+    itoa(e.time_created.mins, timeCreatedM, 10);
+    itoa(e.time_created.secs, timeCreatedS, 10);
+
+    printf("Name ");
+    printf(e.name);
+    printf("\n");
+
+    printf("Time created ");
+    printf(timeCreatedH);
+    printf(" Hours ");
+    printf(timeCreatedM);
+    printf(" Minutes ");
+    printf(timeCreatedS);
+    printf(" Seconds\n");
+
+    printf("Permissions ");
+    printf("Read Only: ");
+    if(e.permissions.ro == 1)
+    {
+        printf("Yes, ");
+    }
+    else
+    {
+        printf("No, ");
+    }
+    printf("Write Only: ");
+    if(e.permissions.wo == 1)
+    {
+        printf("Yes, ");
+    }
+    else
+    {
+        printf("No, ");
+    }
+    printf("System file: ");
+    if(e.permissions.sys == 1)
+    {
+        printf("Yes, ");
+    }
+    else
+    {
+        printf("No, ");
+    }
+    printf("\n");
+}
+
+void VDK_ViewFile(struct RIFS_File e, char* data)
+{
+    printf("\n");
+    printf(e.name);
+    printf("\n");
+    printf(data);
+    printf("\n");
+}
+
 void kmain()
 {
 	/* Initialize everything */
@@ -497,43 +616,95 @@ void kmain()
 	welcome();
 	enable_interrupts();
 
-    printf("\nExample\n");
+    printf("\nDirectory: / \n");
     const int DRIVE = ata_get_drive_by_model("QEMU HARDDISK");
     const uint32_t LBA = 0;
     const uint8_t NO_OF_SECTORS = 1;
     char buf[ATA_SECTOR_SIZE] = {0};
 
-    struct example {
-        int id;
-        char name[32];
-    };
+    char data[512];
 
-    struct example e;
-    e.id = 10012;
-    strcpy(e.name, "Iron Man");
+    // create file and write to drive
+    struct RIFS_File e;
+    perm_t exP;
+    time_t exT;
 
-    // write message to drive
-    strcpy(buf, "Hello World");
-    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA, (uint32_t)buf);
+    exP.ro = 1;
+    exP.wo = 0;
+    exP.sys = 1;
 
-    memset(buf, 0, sizeof(buf));
-    memcpy(buf, &e, sizeof(e));
-    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
-    printf("data written\n");
+    exT.hours = 0;
+    exT.mins = 0;
+    exT.secs = 10;
 
-    // read message from drive
+    e.id = 0;
+    e.permissions = exP;
+    e.time_created = exT;
+    e.time_modified = exT;
+    e.time_accessed = exT;
+    strcpy(e.name, "boot.sys");
+
+    struct RIFS_File e2;
+
+    exP.ro = 0;
+    exP.wo = 0;
+    exP.sys = 1;
+
+    exT.hours = 1;
+    exT.mins = 50;
+    exT.secs = 42;
+
+    e2.id = 1;
+    e2.permissions = exP;
+    e2.time_created = exT;
+    e2.time_modified = exT;
+    e2.time_accessed = exT;
+    strcpy(e2.name, "welcome.txt");
+    strcpy(data, "Welcome to ViaOS 1! This is a text file created automatically by ViaOS.\n We hope you enjoy ViaOS!\n jdfhkjdfhkjdhfjdhfjhsdkjfhdksjfhkjdahfjdhfhdskjfhkjdhfjdshfhdjfhjkahfjhdjkfhlkdhfkjahdlfkdhfjhfdsjfhkjsdhfkjdhfhsfjhasdkhfkjsdhfn\n\nWelcome to ViaOS 1! This is a text file created automatically by ViaOS.\n We hope you enjoy ViaOS!\n jdfhkjdfhkjdhfjdhfjhsdkjfhdksjfhkjdahfjdhfhdskjfhkjdhfjdshfhdjfhjkahfjhdjkfhlkdhfkjahdlfkdhfjhfdsjfhkjsdhfkjdhfhsfjhasdkhfkjsdhfn\n\n");
+
+    /* simple test to read existing HDD data */
     memset(buf, 0, sizeof(buf));
     ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA, (uint32_t)buf);
     printf("read data: ");
-
     printf(buf);
-
     printf("\n");
+    /* simple test to read existing HDD data */
+
+    // write file to drive
+
+    // boot.sys
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, &e, sizeof(e));
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+
+    // welcome.txt
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, &e2, sizeof(e2));
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
 
     memset(buf, 0, sizeof(buf));
+    memcpy(buf, &data, sizeof(data));
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 3, (uint32_t)buf);
+
+    // read drive
+    memset(buf, 0, sizeof(buf));
     ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+    e.id = 29;
     memcpy(&e, buf, sizeof(e));
-    //printf("id: %d, name: %s\n", e.id, e.name);
+
+    memset(buf, 0, sizeof(buf));
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
+    e2.id = 99;
+    memcpy(&e2, buf, sizeof(e2));
+
+    memset(buf, 0, sizeof(buf));
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 3, (uint32_t)buf);
+    memcpy(&data, buf, sizeof(data));
+
+    all_files[0] = e;
+    all_files[1] = e2;
+
+    VDK_ViewFile(e2, data);
 
 	while(1);
 }

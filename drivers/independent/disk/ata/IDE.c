@@ -344,7 +344,7 @@ void ide_init(uint32_t prim_channel_base_addr, uint32_t prim_channel_control_bas
             printf(g_ide_devices[i].drive);
             printf("\n");
 
-            printf("[OK] ATA Driver Initialized\n");
+            printf("[OK] ATA DRIVE FOUND\n");
         }
 }
 
