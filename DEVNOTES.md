@@ -9,7 +9,7 @@ please can everyone be nice to me, i started this project in high school as a ho
 
 ## - Theo
 
-so uhm, viaSh isn't done yet, viaSh.h still needs work. and we can work on the SDK now. also, sorry brad
+im gonna fucking kms if i see the bash folder again
 
 ## - Kap
 i fucking hate everybody.
