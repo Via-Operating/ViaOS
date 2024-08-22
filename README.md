@@ -3,13 +3,15 @@ An x86 Operating System built on the Via Dynamic Kernel (VDK) by The Via Operati
 
 ## How to compile
 ### Linux
-``` sudo apt install build-essential gcc g++ ```
+``` sudo apt install build-essential gcc g++ ``` - So that the prograams will actually work (No need to run this command if you have this)
 
-``` git clone https://github.com/Via-Operating/ViaOS/ ```
+``` git clone https://github.com/Via-Operating/ViaOS/ ``` - Clone ViaOS repo (No need to run this command if you have this)
 
-``` cd ViaOS ```
+``` cd ViaOS ``` - Change the directory to the ViaOS folder
 
-``` sudo make && sudo make iso ```
+```./include/shell/all-commands.sh ``` - Include all commands (Optional)
+
+``` sudo make && sudo make iso ``` - Make and build iso
 
 ### Windows
 Use WSL and follow the steps for linux.
