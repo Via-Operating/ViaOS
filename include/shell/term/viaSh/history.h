@@ -22,16 +22,7 @@ void hist() {
     printf("> ");
 }
 
-void hello() {
-    terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    printf("\nHello!\n");
-    append_hist("hello");
-    printf("> ");
-}
-
-int main() {
-    hello();
-    hello();
+int history() {
     hist();
 
     for (int i = 0; i < history_count; i++) {
