@@ -1,3 +1,7 @@
+#Dev Notes
+
+Please check this everyday
+
 ## - Brad
 
 please can everyone be nice to me, i started this project in high school as a hobby, not where everyone is killing me about rifs? Just click [here](https://github.com/Via-Operating/RIFS). There's rifs, stop hurting me please
