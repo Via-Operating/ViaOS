@@ -3,13 +3,13 @@
 // GNU GPL 3.0 License, Read LICENSE.TXT
 
 #include <via/stdio.h>
-#include <via/shell/term/bash/echo.h>
-#include <via/shell/term/bash/help.h>
-#include <via/shell/term/bash/hi.h>
-#include <via/shell/term/bash/ld.h>
-#include <via/shell/term/bash/cd.h>
-#include <via/shell/term/bash/info.h>
-#include <via/shell/term/bash/shutdown.h>
+#include <via/shell/term/viaSh/echo.h>
+#include <via/shell/term/viaSh/help.h>
+#include <via/shell/term/viaSh/hi.h>
+#include <via/shell/term/viaSh/ld.h>
+#include <via/shell/term/viaSh/cd.h>
+#include <via/shell/term/viaSh/info.h>
+#include <via/shell/term/viaSh/shutdown.h>
 #include <via/via.h>
 
 #define MAX_FILENAME 255
