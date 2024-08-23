@@ -22,6 +22,12 @@ Install [MinGW](https://sourceforge.net/projects/mingw/) and then install gcc
 
 ```Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned``` - Enable script execution (If using powershell)
 
+```./include/shell/all_commands.ps1``` - Include all commands (Powershell)
+
+```./include/shell/all_commands.bat``` - Include all commands (Windows CMD)
+
+```make && make iso``` - Make and build iso (Works on Windows CMD and PWSH)
+
 ### MacOS
 Pretty much same as linux, use homebrew.
 
