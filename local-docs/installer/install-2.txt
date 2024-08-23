@@ -1,0 +1,8 @@
+# License Agreement
+-----
+
+Please review the [license](https://github.com/Via-Operating/ViaOS/wiki#legal) agreement before installing Via Operating System. You must accept the terms to proceed with the installation.
+
+[ ] I accept the terms of the license agreement
+
+[Back] [Next]
