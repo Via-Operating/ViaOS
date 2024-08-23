@@ -9,24 +9,13 @@
 #include <via/shell/term/viaSh/ld.h>
 #include <via/shell/term/viaSh/cd.h>
 #include <via/shell/term/viaSh/info.h>
-#include <via/shell/term/viaSh/vpack.h>
 #include <via/shell/term/viaSh/shutdown.h>
 #include <via/via.h>
 
 #define MAX_FILENAME 255
 #define MAX_FILES 255
 
-struct RIFS_File all_files[MAX_FILES] = {0};
-
-int strcmp(const char *s1, char *s2) {
-    int i = 0;
-
-    while ((s1[i] == s2[i])) {
-        if (s2[i++] == 0)
-            return 0;
-    }
-    return 1;
-}
+struct RIFS_F all_files[MAX_FILES] = {0};
 
 int strcpy(char *dst, const char *src) {
     int i = 0;
@@ -36,40 +25,18 @@ int strcpy(char *dst, const char *src) {
 }
 
 enum BOOL_T poweroff_sys = FALSE;
+enum BOOL_T isInstalled = FALSE;
+enum BOOL_T continueSetup = FALSE;
+enum BOOL_T isInput = TRUE;
+enum BOOL_T stop1 = FALSE;
+enum BOOL_T stop2 = FALSE;
+enum BOOL_T serviceAgreed = FALSE;
+enum BOOL_T servicePage = FALSE;
+enum BOOL_T stop3 = FALSE;
+enum BOOL_T stop4 = FALSE;
+enum BOOL_T next = FALSE;
 
-enum BOOL_T strncmp(const char *str1, const char *str2, size_t n) 
-{
-    // Compare up to n characters or until a null terminator is encountered
-    while (n > 0 && *str1 && *str2) {
-        if (*str1 != *str2) {
-        	if((unsigned char)*str1 - (unsigned char)*str2)
-        	{
-        		return TRUE;
-        	}
-        	else
-        	{
-        		return FALSE;
-        	}
-        }
-        str1++;
-        str2++;
-        n--;
-    }
-
-    // If we've compared all n characters, or reached a null terminator
-    if (n == 0) {
-        return FALSE; // Strings are equal up to n characters
-    }
-    // If we reach here, it means n > 0 and either of the strings has ended
-    if((unsigned char)*str1 - (unsigned char)*str2)
-    {
-		return TRUE;
-    }
-	else
-	{
-		return FALSE;
-	}
-}
+int pageNumber = 0;
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) 
 {
@@ -323,6 +290,12 @@ void whoami()
 static char input_buffer[BUFFER_SIZE];
 static size_t buffer_pos = 0;
 
+static char username[BUFFER_SIZE];
+static int username_pos = 0;
+
+static char ageUser[BUFFER_SIZE];
+static int ageUser_pos = 0;
+
 void handle_keyboard_interrupt()
 {
 	if(poweroff_sys == TRUE)
@@ -367,99 +340,122 @@ void handle_keyboard_interrupt()
 
             if(ch == '\n')
             {
-            	printf("> ");
+            	//printf("> ");
             }
 
             // Commandline
-            if (buffer_pos >= 3 &&
-            	input_buffer[buffer_pos - 3] == 'h' &&
-            	input_buffer[buffer_pos - 2] == 'i' &&
-            	input_buffer[buffer_pos - 1] == '\n')
+            if(isInstalled == TRUE)
             {
-                hello();
-                buffer_pos -= 2; // Adjust buffer position to account for replacement
-            }
+                if (buffer_pos >= 3 &&
+                	input_buffer[buffer_pos - 3] == 'h' &&
+                	input_buffer[buffer_pos - 2] == 'i' &&
+                	input_buffer[buffer_pos - 1] == '\n')
+                {
+                    hello();
+                    buffer_pos -= 2; // Adjust buffer position to account for replacement
+                }
 
-            if (buffer_pos >= 5 &&
-                input_buffer[buffer_pos - 5] == 'i' &&
-                input_buffer[buffer_pos - 4] == 'n' &&
-                input_buffer[buffer_pos - 3] == 'f' &&
-                input_buffer[buffer_pos - 2] == 'o' &&
-                input_buffer[buffer_pos - 1] == '\n')
-            {
-                info();
-                buffer_pos -= 2; // Adjust buffer position to account for replacement
-            }
+                if (buffer_pos >= 5 &&
+                    input_buffer[buffer_pos - 5] == 'i' &&
+                    input_buffer[buffer_pos - 4] == 'n' &&
+                    input_buffer[buffer_pos - 3] == 'f' &&
+                    input_buffer[buffer_pos - 2] == 'o' &&
+                    input_buffer[buffer_pos - 1] == '\n')
+                {
+                    info();
+                    buffer_pos -= 2; // Adjust buffer position to account for replacement
+                }
 
-            if (buffer_pos >= 5 &&
-            	input_buffer[buffer_pos - 5] == 'h' &&
-            	input_buffer[buffer_pos - 4] == 'e' &&
-            	input_buffer[buffer_pos - 3] == 'l' &&
-            	input_buffer[buffer_pos - 2] == 'p' &&
-            	input_buffer[buffer_pos - 1] == '\n')
-            {
-                help_menu();
-                buffer_pos -= 2; // Adjust buffer position to account for replacement
-            }
-		if (buffer_pos >= 6 &&
-            	input_buffer[buffer_pos - 6] == 'v' &&
-            	input_buffer[buffer_pos - 5] == 'p' &&
-            	input_buffer[buffer_pos - 4] == 'a' &&
-            	input_buffer[buffer_pos - 3] == 'c' &&
-		input_buffer[buffer_pos - 2] == 'k' &&
-            	input_buffer[buffer_pos - 1] == '\n')
-            {
-                terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-		printf("Vpack is not added to current Via version");
-            }
+                if (buffer_pos >= 5 &&
+                	input_buffer[buffer_pos - 5] == 'h' &&
+                	input_buffer[buffer_pos - 4] == 'e' &&
+                	input_buffer[buffer_pos - 3] == 'l' &&
+                	input_buffer[buffer_pos - 2] == 'p' &&
+                	input_buffer[buffer_pos - 1] == '\n')
+                {
+                    help_menu();
+                    buffer_pos -= 2; // Adjust buffer position to account for replacement
+                }
 
-            if (buffer_pos >= 3 &&
-            	input_buffer[buffer_pos - 3] == 'l' &&
-            	input_buffer[buffer_pos - 2] == 'd' &&
-            	input_buffer[buffer_pos - 1] == '\n')
-            {
-                list_dir(all_files);
-                buffer_pos -= 2; // Adjust buffer position to account for replacement
-            }
+                if (buffer_pos >= 3 &&
+                	input_buffer[buffer_pos - 3] == 'l' &&
+                	input_buffer[buffer_pos - 2] == 'd' &&
+                	input_buffer[buffer_pos - 1] == '\n')
+                {
+                    list_dir(all_files);
+                    buffer_pos -= 2; // Adjust buffer position to account for replacement
+                }
 
-            if (buffer_pos >= 7 &&
-            	input_buffer[buffer_pos - 7] == 'w' &&
-            	input_buffer[buffer_pos - 6] == 'h' &&
-            	input_buffer[buffer_pos - 5] == 'o' &&
-            	input_buffer[buffer_pos - 4] == 'a' &&
-            	input_buffer[buffer_pos - 3] == 'm' &&
-            	input_buffer[buffer_pos - 2] == 'i' &&
-            	input_buffer[buffer_pos - 1] == '\n')
-            {
-                whoami();
-                buffer_pos -= 2; // Adjust buffer position to account for replacement
-            }
+                if (buffer_pos >= 7 &&
+                	input_buffer[buffer_pos - 7] == 'w' &&
+                	input_buffer[buffer_pos - 6] == 'h' &&
+                	input_buffer[buffer_pos - 5] == 'o' &&
+                	input_buffer[buffer_pos - 4] == 'a' &&
+                	input_buffer[buffer_pos - 3] == 'm' &&
+                	input_buffer[buffer_pos - 2] == 'i' &&
+                	input_buffer[buffer_pos - 1] == '\n')
+                {
+                    whoami();
+                    buffer_pos -= 2; // Adjust buffer position to account for replacement
+                }
 
-            if (buffer_pos >= 9 &&
-            	input_buffer[buffer_pos - 9] == 's' &&
-            	input_buffer[buffer_pos - 8] == 'h' &&
-            	input_buffer[buffer_pos - 7] == 'u' &&
-            	input_buffer[buffer_pos - 6] == 't' &&
-            	input_buffer[buffer_pos - 5] == 'd' &&
-            	input_buffer[buffer_pos - 4] == 'o' &&
-            	input_buffer[buffer_pos - 3] == 'w' &&
-            	input_buffer[buffer_pos - 2] == 'n' &&
-            	input_buffer[buffer_pos - 1] == '\n')
-            {
-                shutdown();
-                disable_interrupts();
-                poweroff_sys = TRUE;
-                buffer_pos -= 2; // Adjust buffer position to account for replacement
-                return;
-            }
+                if (buffer_pos >= 9 &&
+                	input_buffer[buffer_pos - 9] == 's' &&
+                	input_buffer[buffer_pos - 8] == 'h' &&
+                	input_buffer[buffer_pos - 7] == 'u' &&
+                	input_buffer[buffer_pos - 6] == 't' &&
+                	input_buffer[buffer_pos - 5] == 'd' &&
+                	input_buffer[buffer_pos - 4] == 'o' &&
+                	input_buffer[buffer_pos - 3] == 'w' &&
+                	input_buffer[buffer_pos - 2] == 'n' &&
+                	input_buffer[buffer_pos - 1] == '\n')
+                {
+                    shutdown();
+                    disable_interrupts();
+                    poweroff_sys = TRUE;
+                    buffer_pos -= 2; // Adjust buffer position to account for replacement
+                    return;
+                }
 
-            if (buffer_pos >= 3 &&
-                input_buffer[buffer_pos - 3] == 'c' &&
-                input_buffer[buffer_pos - 2] == 'd' &&
-                input_buffer[buffer_pos - 1] == '\n')
+                if (buffer_pos >= 3 &&
+                    input_buffer[buffer_pos - 3] == 'c' &&
+                    input_buffer[buffer_pos - 2] == 'd' &&
+                    input_buffer[buffer_pos - 1] == '\n')
+                {
+                    VDKChangeDir("VIPERRRRRRRRRRRRRRRRRRR MY GUYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY HOW ARE YOU?");
+                    buffer_pos -= 2; // Adjust buffer position to account for replacement
+                }
+            }
+            else
             {
-                VDKChangeDir("VIPERRRRRRRRRRRRRRRRRRR MY GUYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY HOW ARE YOU?");
-                buffer_pos -= 2; // Adjust buffer position to account for replacement
+                if (buffer_pos >= 1 &&
+                    input_buffer[buffer_pos - 1] == '1' && servicePage == FALSE)
+                {
+                    printf("\nCONTINUED\n");
+                    continueSetup = TRUE;
+                    pageNumber = 1;
+                    buffer_pos -= 1; // Adjust buffer position to account for replacement
+                }
+
+                if (buffer_pos >= 1 &&
+                    input_buffer[buffer_pos - 1] == '2' && servicePage == FALSE)
+                {
+                    printf("\nQUIT SETUP\n");
+                    isInput = FALSE;
+                    poweroff_sys = TRUE;
+                    buffer_pos -= 1; // Adjust buffer position to account for replacement
+                }
+
+                if(servicePage == TRUE)
+                {
+                    if (buffer_pos >= 1 &&
+                    input_buffer[buffer_pos - 1] == '1')
+                    {
+                        serviceAgreed = TRUE;
+                        pageNumber = 2;
+                        buffer_pos = 0; // Adjust buffer position to account for replacement
+                    }
+                }
             }
         }
     }
@@ -474,9 +470,8 @@ void welcome()
 	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
 
 	printf("Welcome to ViaOS 1.0.0\n");
-	printf("KERNEL VERSION 0.5\n");
+	printf("KERNEL VERSION 0.8\n");
 	printf("Copyright 2024 Via\n");
-	printf("> ");
 }
 
 void *memset(void *dst, char c, uint32_t n) {
@@ -554,6 +549,16 @@ void itoa(int num, char* str, int base) {
     }
 }
 
+int strcmp(const char *s1, char *s2) {
+    int i = 0;
+
+    while ((s1[i] == s2[i])) {
+        if (s2[i++] == 0)
+            return 0;
+    }
+    return 1;
+}
+
 void VDK_InterpretFile(struct RIFS_File e)
 {
     char idSh[MAX_FILENAME];
@@ -609,13 +614,18 @@ void VDK_InterpretFile(struct RIFS_File e)
     printf("\n");
 }
 
-void VDK_ViewFile(struct RIFS_File e, char* data)
+void VDK_ViewFile(struct RIFS_F e)
 {
     printf("\n");
-    printf(e.name);
+    printf(e.metadata.name);
     printf("\n");
-    printf(data);
+    printf(e.data);
     printf("\n");
+}
+
+void in_tos()
+{
+    printf("Last updated 3:07PM IST 8/23/2024\n\n");
 }
 
 void kmain()
@@ -628,16 +638,18 @@ void kmain()
 	welcome();
 	enable_interrupts();
 
-    printf("\nDirectory: / \n");
-    const int DRIVE = ata_get_drive_by_model("QEMU HARDDISK");
+    const int DRIVE = ata_get_drive_by_model("VBOX HARDDISK");
     const uint32_t LBA = 0;
     const uint8_t NO_OF_SECTORS = 1;
     char buf[ATA_SECTOR_SIZE] = {0};
 
     char data[512];
+    char data2[512];
+    char data3[512];
 
     // create file and write to drive
     struct RIFS_File e;
+    struct RIFS_F bootSYS;
     perm_t exP;
     time_t exT;
 
@@ -655,8 +667,13 @@ void kmain()
     e.time_modified = exT;
     e.time_accessed = exT;
     strcpy(e.name, "boot.sys");
+    strcpy(data2, "INSTALLED\n/\n");
+
+    bootSYS.metadata = e;
+    strcpy(bootSYS.data, data2);
 
     struct RIFS_File e2;
+    struct RIFS_F welcomeTXT;    
 
     exP.ro = 0;
     exP.wo = 0;
@@ -672,51 +689,158 @@ void kmain()
     e2.time_modified = exT;
     e2.time_accessed = exT;
     strcpy(e2.name, "welcome.txt");
-    strcpy(data, "Welcome to ViaOS 1! This is a text file created automatically by ViaOS.\n We hope you enjoy ViaOS!\n jdfhkjdfhkjdhfjdhfjhsdkjfhdksjfhkjdahfjdhfhdskjfhkjdhfjdshfhdjfhjkahfjhdjkfhlkdhfkjahdlfkdhfjhfdsjfhkjsdhfkjdhfhsfjhasdkhfkjsdhfn\n\nWelcome to ViaOS 1! This is a text file created automatically by ViaOS.\n We hope you enjoy ViaOS!\n jdfhkjdfhkjdhfjdhfjhsdkjfhdksjfhkjdahfjdhfhdskjfhkjdhfjdshfhdjfhjkahfjhdjkfhlkdhfkjahdlfkdhfjhfdsjfhkjsdhfkjdhfhsfjhasdkhfkjsdhfn\n\n");
+    strcpy(data, "Welcome to ViaOS 1! This is a text file created automatically by ViaOS.\nWe hope you enjoy ViaOS!\n");
 
-    /* simple test to read existing HDD data */
+    welcomeTXT.metadata = e2;
+    strcpy(welcomeTXT.data, data);
+
+    struct RIFS_File e3;
+    struct RIFS_F desktopCFG;    
+
+    exP.ro = 0;
+    exP.wo = 0;
+    exP.sys = 1;
+
+    exT.hours = 0;
+    exT.mins = 0;
+    exT.secs = 16;
+
+    e3.id = 2;
+    e3.permissions = exP;
+    e3.time_created = exT;
+    e3.time_modified = exT;
+    e3.time_accessed = exT;
+    strcpy(e3.name, "desktop.cfg");
+    strcpy(data3, "NULL");
+
+    desktopCFG.metadata = e3;
+    strcpy(desktopCFG.data, data3);
+
+    // Read boot.sys off disk and check if ViaOS is installed
     memset(buf, 0, sizeof(buf));
-    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA, (uint32_t)buf);
-    printf("read data: ");
-    printf(buf);
-    printf("\n");
-    /* simple test to read existing HDD data */
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
 
-    // write file to drive
+    if(strcmp(buf, "INSTALLED\n/\n") == 0)
+    {
+        printf("Verified ViaOS Installation\n");
+        isInstalled = TRUE;
+    }
+
+    // Read boot.sys off disk
+
+    // write files to drive
 
     // boot.sys
-    memset(buf, 0, sizeof(buf));
-    memcpy(buf, &e, sizeof(e));
-    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+    // memset(buf, 0, sizeof(buf));
+    // memcpy(buf, &e, sizeof(e));
+    // ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+
+    // memset(buf, 0, sizeof(buf));
+    // memcpy(buf, &data2, sizeof(data2));
+    // ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
 
     // welcome.txt
     memset(buf, 0, sizeof(buf));
     memcpy(buf, &e2, sizeof(e2));
-    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 3, (uint32_t)buf);
 
     memset(buf, 0, sizeof(buf));
     memcpy(buf, &data, sizeof(data));
-    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 3, (uint32_t)buf);
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 4, (uint32_t)buf);
+
+    // desktop.cfg
+    // memset(buf, 0, sizeof(buf));
+    // memcpy(buf, &e3, sizeof(e3));
+    // ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 5, (uint32_t)buf);
+
+    // memset(buf, 0, sizeof(buf));
+    // memcpy(buf, &data3, sizeof(data3));
+    // ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 6, (uint32_t)buf);
+
+    // write files to drive
 
     // read drive
-    memset(buf, 0, sizeof(buf));
-    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
-    e.id = 29;
-    memcpy(&e, buf, sizeof(e));
 
+    // boot.sys
+    // memset(buf, 0, sizeof(buf));
+    // ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+    // e.id = 29;
+    // memcpy(&e, buf, sizeof(e));
+
+    // welcome.txt
     memset(buf, 0, sizeof(buf));
-    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 3, (uint32_t)buf);
     e2.id = 99;
     memcpy(&e2, buf, sizeof(e2));
 
+    // welcome data
     memset(buf, 0, sizeof(buf));
-    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 3, (uint32_t)buf);
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 4, (uint32_t)buf);
     memcpy(&data, buf, sizeof(data));
 
-    all_files[0] = e;
-    all_files[1] = e2;
+    // boot data
+    //memset(buf, 0, sizeof(buf));
+    //ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
+    //memcpy(&data2, buf, sizeof(data2));
 
-    VDK_ViewFile(e2, data);
+    // desktop.cfg
+    memset(buf, 0, sizeof(buf));
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 5, (uint32_t)buf);
 
-	while(1);
+    memcpy(&e3, buf, sizeof(e3));
+
+    // desktop data
+    memset(buf, 0, sizeof(buf));
+    ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 6, (uint32_t)buf);
+    memcpy(&data3, buf, sizeof(data3));
+
+    // read drive
+
+    // Add files to table
+    all_files[0] = welcomeTXT;
+    all_files[1] = bootSYS;
+    all_files[2] = desktopCFG;
+    // Add files to table
+
+    //VDK_ViewFile(welcomeTXT);
+    //VDK_ViewFile(bootSYS);
+    //VDK_ViewFile(desktopCFG);
+
+	while(1)
+    {
+        if(isInstalled == FALSE && stop1 == FALSE)
+        {
+            printf("\nViaOS 1.0 Installer\n");
+            printf("\nPress 1 to continue setup.\n");
+            printf("Press 2 to exit setup.\n");
+            stop1 = TRUE;
+        }
+
+        if(pageNumber == 1 && stop2 == FALSE)
+        {
+            printf("TERMS OF SERVICE -- PRESS 1 TO AGREE.\n\n");
+            in_tos();
+            servicePage = TRUE;
+            stop2 = TRUE;
+        }
+
+        if(serviceAgreed == TRUE && pageNumber == 2 && stop3 == FALSE)
+        {
+            terminal_initialize();
+            printf("Hi, We are installing your system...\n");
+
+            // boot.sys
+            memset(buf, 0, sizeof(buf));
+            memcpy(buf, &e, sizeof(e));
+            ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+
+            memset(buf, 0, sizeof(buf));
+            memcpy(buf, &data2, sizeof(data2));
+            ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
+
+            printf("We have successfully installed your system, Please reboot.\n");
+
+            stop3 = TRUE;
+        }
+    }
 }

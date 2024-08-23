@@ -101,7 +101,7 @@ _start:
 	mov fs, ax
 	mov gs, ax
 	mov esp, stack_top
-	cli
+
     mov esp, stack_top
     push ebx
     call kmain

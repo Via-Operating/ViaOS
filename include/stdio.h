@@ -48,7 +48,12 @@ enum vga_color
         char name[32];
     };
 
-int strcmp(const char *s1, char *s2);
+    struct RIFS_F
+    {
+        struct RIFS_File metadata;
+        char data[512];
+    };
+
 int strcpy(char *dst, const char *src);
 
 extern char ioport_in(unsigned short port); // uint16_t port
@@ -57,8 +62,6 @@ extern void ioport_out(unsigned short port, unsigned char data);
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg);
 
 static inline uint16_t vga_entry(unsigned char uc, uint8_t color);
-
-enum BOOL_T strncmp(const char *str1, const char *str2, size_t n);
 
 size_t strlen(const char* str);
 
@@ -77,6 +80,9 @@ void printf(const char* data);
 void idt_set_entry(int index, uint32_t base, uint8_t flags);
 
 void VDK_InterpretFile(struct RIFS_File e);
-void VDK_ViewFile(struct RIFS_File e, char* data);
+void VDK_ViewFile(struct RIFS_F e);
+
+void itoa(int num, char* str, int base);
+int strcmp(const char *s1, char *s2);
 
 #endif
