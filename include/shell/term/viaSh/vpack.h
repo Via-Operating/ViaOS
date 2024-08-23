@@ -4,6 +4,8 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#include <stdint.h>
+
 void vpack_install(void);
 
 void vpack_update(void);
@@ -19,7 +21,7 @@ typedef struct {
     char version[10];
     char description[256];
     char author[50]; 
-    uint32 id;
+    uint32_t id;
 } Package;
 
 #endif
