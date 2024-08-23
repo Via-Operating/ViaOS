@@ -1,0 +1,13 @@
+# Select Your Language
+-----
+
+Please select your preferred language for the installation process and the operating system.
+
+- [ ] English
+- [ ] Español
+- [ ] Français
+- [ ] Deutsch
+- [ ] 中文
+- [ ] 日本語
+
+[Back] [Next]
