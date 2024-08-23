@@ -9,6 +9,7 @@
 #include <via/shell/term/viaSh/ld.h>
 #include <via/shell/term/viaSh/cd.h>
 #include <via/shell/term/viaSh/info.h>
+#include <via/shell/term/viaSh/vpack.h>
 #include <via/shell/term/viaSh/shutdown.h>
 #include <via/via.h>
 
@@ -399,6 +400,17 @@ void handle_keyboard_interrupt()
             {
                 help_menu();
                 buffer_pos -= 2; // Adjust buffer position to account for replacement
+            }
+		if (buffer_pos >= 6 &&
+            	input_buffer[buffer_pos - 6] == 'v' &&
+            	input_buffer[buffer_pos - 5] == 'p' &&
+            	input_buffer[buffer_pos - 4] == 'a' &&
+            	input_buffer[buffer_pos - 3] == 'c' &&
+		input_buffer[buffer_pos - 2] == 'k' &&
+            	input_buffer[buffer_pos - 1] == '\n')
+            {
+                terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+		printf("Vpack is not added to current Via version");
             }
 
             if (buffer_pos >= 3 &&
