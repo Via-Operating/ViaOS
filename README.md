@@ -14,7 +14,13 @@ An x86 Operating System built on the Via Dynamic Kernel (VDK) by The Via Operati
 ``` sudo make && sudo make iso ``` - Make and build iso
 
 ### Windows
-Use WSL and follow the steps for linux.
+Install [MinGW](https://sourceforge.net/projects/mingw/) and then install gcc
+
+```git clone https://github.com/Via-Operating/ViaOS/``` - Clone ViaOS repo (No need to run this command if you have this)
+
+``` cd ViaOS ``` - Change the directory to the ViaOS folder
+
+```Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned``` - Enable script execution (If using powershell)
 
 ### MacOS
 Pretty much same as linux, use homebrew.
