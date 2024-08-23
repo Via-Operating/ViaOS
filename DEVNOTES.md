@@ -9,7 +9,7 @@ please can everyone be nice to me, i started this project in high school as a ho
 
 ## - Theo
 
-im gonna fucking kms if i see the bash folder again
+made tos, time to work on ViaSh... again...
 
 ## - Kap
 i fucking hate everybody.
