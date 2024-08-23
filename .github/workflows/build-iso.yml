@@ -28,16 +28,15 @@ jobs:
 
       - name: Make and build ISO
         run: |
-          mkdir -p build
-          mkdir -p /usr/local/include/via
-          cp -R --preserve=timestamps include/. /usr/local/include/via/.
+          mkdir -p wbuild
+          cp -R --preserve=timestamps include/. wbuild/
           sudo make
           sudo make iso
-          mv *.iso build/
+          mv *.iso wbuild/
         shell: /usr/bin/bash -e {0}
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v3
         with:
           name: ViaOS-ISO
-          path: build/*.iso
+          path: wbuild/*.iso
