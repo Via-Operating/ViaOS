@@ -1,3 +1,5 @@
 Welcome to the Via Operating System Installer.
 
+This installer will help you install Via Operating System. Please click "Next" to get started.
+
 [Back] [Next]
