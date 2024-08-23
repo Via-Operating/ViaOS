@@ -625,7 +625,19 @@ void VDK_ViewFile(struct RIFS_F e)
 
 void in_tos()
 {
-    printf("Last updated 3:07PM IST 8/23/2024\n\n");
+    printf("Last updated 9:00PM IST 8/23/2024\n\n");
+    printf("Introduction\n");
+    printf("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are under the age of consent or a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n");
+    printf("What you can and can't do with our software\n\n");
+    printf("When you download our software (This can include ViaOS, pre-installed software, and more), you aren't allowed to:\n");
+    printf("- Sell or give copies of ViaOS (This OS is literally free);\n- Make commercial use of ViaOS;\n- Sell it in blacklisted nations (This can include nations that have our OS banned and embargoed nations);\n- And use our software for illegal or malicious intent.\nOtherwise, you could customize your copy of ViaOS (But not distribute it or sell it), use it for projects, and basically anything (That complies with this TOS and laws of course)\n");
+    printf("\nPrivacy\n");
+    printf("Your privacy is important to us, that means we can't:\n");
+    printf("\n- Install spyware or malicious software on your PC or device;\n- Take your files away from you (Unless they're illegal or a TS breaker);\n- And anything else that breaks internet/data privacy laws in your country.\n");
+    printf("\nBut, when you break the TOS, we can:\n");
+    printf("- Take away your copy(ies) of ViaOS;\n- Get you arrested if we manage to find anything illegal (And what we mean by 'if we manage to find anything illegal' is that if we find proof of you having illegal activity. We can't look into your personal data);\n- And threaten to sue\n");
+    printf("\nConclusion\n");
+    printf("Your local law may give you rights that this TOS cannot change. if so, this TOS applies as far as the law allows.\nIf we have or find reason to, we can change and edit or TOS from time to time. These reasons can include: updates to our OS, our company practices, and our legal obligation. But those changes will be effective only to the extent that they can legally apply. In that case we'll try to inform you of the change before it takes effect.\n");
 }
 
 void kmain()
