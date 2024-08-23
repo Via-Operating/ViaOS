@@ -1,0 +1,38 @@
+name: Build and Create ISO
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential gcc g++
+
+      - name: Include all commands (Optional)
+        run: |
+          chmod +x ./include/shell/all-commands.sh
+          ./include/shell/all-commands.sh
+
+      - name: Make and build ISO
+        run: |
+          mkdir -p build
+          sudo make
+          sudo make iso
+          mv *.iso build/
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ViaOS-ISO
+          path: build/*.iso
