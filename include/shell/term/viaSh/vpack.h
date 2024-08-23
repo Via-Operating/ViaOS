@@ -14,4 +14,12 @@ void vpack_search(void);
 
 void vpack_list(void);
 
+typedef struct {
+    char name[100];
+    char version[10];
+    char description[256];
+    char author[50]; 
+    uint32 id;
+} Package;
+
 #endif
