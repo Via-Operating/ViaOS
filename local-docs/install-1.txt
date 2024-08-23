@@ -1,0 +1,3 @@
+Welcome to the Via Operating System Installer.
+
+[Back] [Next]
