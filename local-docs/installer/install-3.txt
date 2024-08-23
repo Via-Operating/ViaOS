@@ -1,0 +1,9 @@
+# Choose Installation Type
+-----
+
+Please select the type of installation you would like to perform.
+
+- [ ] Full Installation - Install the standard Via operating system (Recommended for casual use)
+- [ ] Custom Installation - Lets you configure different settings (Recommended for advanced use)
+
+[Back] [Next]
