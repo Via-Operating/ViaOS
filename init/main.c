@@ -3,6 +3,7 @@
 // GNU GPL 3.0 License, Read LICENSE.TXT
 
 #include <via/stdio.h>
+#include <via/shell/term/viaSh/history.h>
 #include <via/shell/term/viaSh/echo.h>
 #include <via/shell/term/viaSh/help.h>
 #include <via/shell/term/viaSh/hi.h>
@@ -14,6 +15,7 @@
 
 #define MAX_FILENAME 255
 #define MAX_FILES 255
+
 
 struct RIFS_F all_files[MAX_FILES] = {0};
 
@@ -384,6 +386,21 @@ void handle_keyboard_interrupt()
                     info();
                     buffer_pos -= 2; // Adjust buffer position to account for replacement
                 }
+
+		if (buffer_pos >= 8 &&
+                    input_buffer[buffer_pos - 8] == 'h' &&
+                    input_buffer[buffer_pos - 7] == 'i' &&
+                    input_buffer[buffer_pos - 6] == 's' &&
+                    input_buffer[buffer_pos - 5] == 't' &&
+                    input_buffer[buffer_pos - 4] == 'o') &&
+		    input_buffer[buffer_pos - 3] == 'r' &&
+		    input_buffer[buffer_pos - 2] == 'y' &&
+                    input_buffer[buffer_pos - 1] == '\n' &&
+                {
+               	    history();
+                    buffer_pos -= 2; // Adjust buffer position to account for replacement
+                }
+
 
                 if (buffer_pos >= 5 &&
                 	input_buffer[buffer_pos - 5] == 'h' &&
