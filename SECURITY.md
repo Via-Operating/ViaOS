@@ -8,7 +8,7 @@
 
 ### Introduction
 
-If download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are under the age of consent or a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.
+If download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.
 
 ### What you can and can't do with our software
 
