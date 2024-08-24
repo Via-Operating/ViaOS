@@ -687,13 +687,13 @@ void in_tos()
         bitmap_draw_string("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are under the age of consent or a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n", BLACK);
         bitmap_draw_string("What you can and can't do with our software\n\n", BLACK);
         bitmap_draw_string("When you download our software (This can include ViaOS, pre-installed software, and more), you aren't allowed to:\n", BLACK);
-        bitmap_draw_string("- Sell or give copies of ViaOS (This OS is literally free);\n", BLACK);
+        bitmap_draw_string("- Sell or give copies of ViaOS (This OS is free);\n", BLACK);
         // stops
 }
 
 void in_tos2()
 {
-        bitmap_draw_string("- Make commercial use of ViaOS;\n- Sell it in blacklisted nations (This can include nations that have our OS banned and embargoed nations);\n- And use our software for illegal or malicious intent.\nOtherwise, you could customize your copy of ViaOS (But not distribute it or sell it), use it for projects, and basically anything (That complies with this TOS and laws of course)\n", BLACK);
+        bitmap_draw_string("- Make commercial use without a commercial license provided by one of our maintainers (For more, look at the ViaOS wiki on our GitHub repository in our commercial section);\n- Sell it in blacklisted nations (This can include nations that have our OS banned and embargoed nations);\n- And use our software for illegal or malicious intent.\nOtherwise, you could customize your copy of ViaOS (But not distribute it or sell it), use it for projects, and basically anything (That complies with this TOS and laws of course)\n", BLACK);
         bitmap_draw_string("\nPrivacy\n", BLACK);
         bitmap_draw_string("Your privacy is important to us, that means we can't:\n", BLACK);
         bitmap_draw_string("\n- Install spyware or malicious software on your PC or device;\n- Take your files away from you (Unless they're illegal or a TS breaker);\n", BLACK);
