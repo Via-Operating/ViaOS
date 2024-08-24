@@ -9,7 +9,7 @@ making community stuff, like webpage and wiki...
 
 ## - Theo
 
-made tos, time to work on ViaSh... again...
+edited wiki, time to do more ViaSh stuff!!!!!!!!!!!!
 
 ## - Kap
 i fucking hate everybody.
