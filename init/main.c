@@ -37,6 +37,10 @@ enum BOOL_T stop4 = FALSE;
 enum BOOL_T next = FALSE;
 
 int pageNumber = 0;
+int xBitMap = 0;
+
+uint16_t mx = 0;
+uint16_t my = 0;
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) 
 {
@@ -177,6 +181,7 @@ void init()
 
 #include "../drivers/intel/intel_ps2keyboard/keyboard_map.h"
 #include "../drivers/independent/disk/ata/IDE.h"
+#include "../drivers/independent/graphics/vga/vga.h"
 
 extern void load_gdt();
 extern void keyboard_handler();
@@ -337,6 +342,7 @@ void handle_keyboard_interrupt()
 
             // Print character to terminal
             terminal_putchar(ch);
+            bitmap_putchar(ch, BLACK);
 
             if(ch == '\n')
             {
@@ -424,6 +430,34 @@ void handle_keyboard_interrupt()
                 {
                     VDKChangeDir("VIPERRRRRRRRRRRRRRRRRRR MY GUYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY HOW ARE YOU?");
                     buffer_pos -= 2; // Adjust buffer position to account for replacement
+                }
+
+                if (buffer_pos >= 1 &&
+                    input_buffer[buffer_pos - 1] == 'd')
+                {
+                    mx++;
+                    buffer_pos -= 1; // Adjust buffer position to account for replacement
+                }
+
+                if (buffer_pos >= 1 &&
+                    input_buffer[buffer_pos - 1] == 's')
+                {
+                    my++;
+                    buffer_pos -= 1; // Adjust buffer position to account for replacement
+                }
+
+                if (buffer_pos >= 1 &&
+                    input_buffer[buffer_pos - 1] == 'w')
+                {
+                    my--;
+                    buffer_pos -= 1; // Adjust buffer position to account for replacement
+                }
+
+                if (buffer_pos >= 1 &&
+                    input_buffer[buffer_pos - 1] == 'a')
+                {
+                    mx--;
+                    buffer_pos -= 1; // Adjust buffer position to account for replacement
                 }
             }
             else
@@ -740,6 +774,16 @@ void kmain()
 
     // Read boot.sys off disk
 
+    if(isInstalled == TRUE)
+    {
+        vga_graphics_init();
+        vga_graphics_clear_color(WHITE);
+        vga_graphics_fill_rect(20, 24, 50, 50, BLUE);
+
+        bitmap_draw_string("Test 1!", BLACK);
+        bitmap_draw_string(" Test 2!", BLACK);
+    }
+
     // write files to drive
 
     // boot.sys
@@ -853,6 +897,14 @@ void kmain()
             printf("We have successfully installed your system, Please reboot.\n");
 
             stop3 = TRUE;
+        }
+
+        if(isInstalled == TRUE)
+        {
+            // this shit causes tearing: vga_graphics_clear_color(WHITE);
+            vga_graphics_draw_circle(50 + mx, 24 + my, 3, RED);
+            //bitmap_draw_char('e', 0, 0, BLACK);
+            //bitmap_draw_string("Hello World!", 0, 0, BLACK);
         }
     }
 }
