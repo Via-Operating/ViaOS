@@ -14,7 +14,7 @@ edited wiki, time to do more ViaSh stuff!!!!!!!!!!!! glad to see this os become 
 ## - Kap
 i fucking hate everybody.
 
-Jokes aside: GUI Implemented, and also. Bitmap fonts. check vga.c's bitmap putchar function.. that took me way long to figure out newline shit... Next? Mouse driver.
+Jokes aside: Graphical installer! Although cuz no mouse yet, its pretty much non-UI... Next? Mouse driver.
 
 ## - Vincent
 [MASTER OF PUPPETS](https://open.spotify.com/track/2MuWTIM3b0YEAskbeeFE1i?si=POP0gB4nSY-stbqPH6Yt4w), I'M PULLING YOUR STRINGS!
