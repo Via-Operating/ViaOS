@@ -661,7 +661,7 @@ void in_tos()
 {
     printf("Last updated 9:00PM IST 8/23/2024\n\n");
     printf("Introduction\n");
-    printf("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are under the age of consent or a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n");
+    printf("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n");
     printf("What you can and can't do with our software\n\n");
     printf("When you download our software (This can include ViaOS, pre-installed software, and more), you aren't allowed to:\n");
     printf("- Sell or give copies of ViaOS (This OS is literally free);\n- Make commercial use of ViaOS;\n- Sell it in blacklisted nations (This can include nations that have our OS banned and embargoed nations);\n- And use our software for illegal or malicious intent.\nOtherwise, you could customize your copy of ViaOS (But not distribute it or sell it), use it for projects, and basically anything (That complies with this TOS and laws of course)\n");
