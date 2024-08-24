@@ -14,7 +14,7 @@ made tos, time to work on ViaSh... again...
 ## - Kap
 i fucking hate everybody.
 
-Jokes aside: Installer implemented, although it doesnt do much admittedly... Anyway, i implemented Theo's TOS too.
+Jokes aside: Installer implemented, although it doesnt do much admittedly... Anyway, i implemented Theo's TOS too. Today imma finna try GUI shit.  Next?? Mouser driver hell chawwwwwwwwwwwwwwwwwww
 
 ## - Vincent
 [MASTER OF PUPPETS](https://open.spotify.com/track/2MuWTIM3b0YEAskbeeFE1i?si=POP0gB4nSY-stbqPH6Yt4w), I'M PULLING YOUR STRINGS!
