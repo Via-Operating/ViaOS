@@ -88,6 +88,57 @@ void set_crt_controller_registers()
     }
 }
 
+void *memmove(void *dest, const void *src, size_t n) {
+    unsigned char *d = dest;
+    const unsigned char *s = src;
+
+    // Handle overlapping regions
+    if (d < s || d >= s + n) {
+        // Non-overlapping or destination is before the source
+        while (n--) {
+            *d++ = *s++;
+        }
+    } else {
+        // Overlapping regions, copy from the end to avoid overwriting
+        d += n;
+        s += n;
+        while (n--) {
+            *(--d) = *(--s);
+        }
+    }
+
+    return dest;
+}
+
+void vga_graphics_scroll_up(uint16_t rows, uint8_t color) 
+{
+    uint32_t row_size = 320; // Assuming 320x200 resolution
+    uint32_t bytes_to_move = row_size * (200 - rows);
+
+    // Move data up by `rows`
+    memmove(g_vga_buffer, g_vga_buffer + row_size * rows, bytes_to_move);
+
+    // Fill the newly exposed rows at the bottom with the specified color
+    uint8_t* row_start = g_vga_buffer + bytes_to_move;
+    for (uint32_t i = 0; i < row_size * rows; i++)
+        row_start[i] = color;
+}
+
+void vga_graphics_scroll_down(uint16_t rows, uint8_t color) 
+{
+    uint32_t row_size = 320; // Assuming 320x200 resolution
+    uint32_t bytes_to_move = row_size * (200 - rows);
+
+    // Move data down by `rows`
+    memmove(g_vga_buffer + row_size * rows, g_vga_buffer, bytes_to_move);
+
+    // Fill the newly exposed rows at the top with the specified color
+    uint8_t* row_end = g_vga_buffer;
+    for (uint32_t i = 0; i < row_size * rows; i++)
+        row_end[i] = color;
+}
+
+
 void vga_graphics_init() 
 {
     set_miscellaneous_registers();
@@ -313,16 +364,23 @@ char ASCII_BITMAPS[128][8] = {
 static int current_x = 0;
 static int current_y = 0;
 
+static int new = 0;
+static int counter = 1;
+
 // Function to set the initial position for the text
 void set_text_position(int x, int y) {
     current_x = x;
     current_y = y;
+    new = 0;
+    counter = 1;
 }
 
 // Function to reset the position back to (0, 0) or another default
 void reset_text_position() {
     current_x = 0;
     current_y = 0;
+    new = 0;
+    counter = 1;
 }
 
 void bitmap_draw_char(char ch, uint8_t color) 
@@ -345,22 +403,6 @@ void bitmap_draw_char(char ch, uint8_t color)
     current_y = 0;
 }
 
-void bitmap_draw_string(const char *str, uint8_t color) 
-{
-    while (*str) {
-        if (current_x > VGA_MAX_WIDTH - 8) {
-        	current_x = 0;    // Reset to the start of the line
-            current_y += 9;
-        }
-        bitmap_draw_char(*str, color);
-        current_y = 0;
-        str++;
-    }
-}
-
-static int new = 0;
-static int counter = 1;
-
 void bitmap_putchar(char ch, uint8_t c)
 {
 	if (current_x > VGA_MAX_WIDTH - 8) 
@@ -371,10 +413,35 @@ void bitmap_putchar(char ch, uint8_t c)
         counter++;
    	}
 
+   	if (ch == '\n') 
+    {
+        current_x = 0;    // Reset to the start of the line
+	    current_y += 9;
+	    new = 1;
+	    counter++;
+	    return;
+    }
+
     bitmap_draw_char(ch, c);
 
     if(new == 1)
    	{
    		current_y += 9 * counter;
    	}
+}
+
+void bitmap_draw_string(const char *str, uint8_t color) 
+{
+    while (*str) 
+    {
+        bitmap_putchar(*str, color);
+        str++;
+    }
+}
+
+void update_text_position()
+{
+    // Adjust text position if needed after scrolling
+    current_y = 0;
+    current_x = 0;
 }

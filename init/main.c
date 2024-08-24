@@ -35,6 +35,11 @@ enum BOOL_T servicePage = FALSE;
 enum BOOL_T stop3 = FALSE;
 enum BOOL_T stop4 = FALSE;
 enum BOOL_T next = FALSE;
+enum BOOL_T stop5 = FALSE;
+enum BOOL_T stop6 = FALSE;
+enum BOOL_T agreePage = FALSE;
+enum BOOL_T stop7 = FALSE;
+enum BOOL_T agreePage2 = FALSE;
 
 int pageNumber = 0;
 int xBitMap = 0;
@@ -341,8 +346,16 @@ void handle_keyboard_interrupt()
             input_buffer[buffer_pos] = '\0'; // Null-terminate the string
 
             // Print character to terminal
-            terminal_putchar(ch);
-            bitmap_putchar(ch, BLACK);
+            //terminal_putchar(ch);
+
+            if(agreePage2 == TRUE && isInstalled == FALSE)
+            {
+                  pageNumber = 2;
+            }
+            else
+            {
+                bitmap_putchar(ch, BLACK);
+            }
 
             if(ch == '\n')
             {
@@ -388,7 +401,8 @@ void handle_keyboard_interrupt()
                 	input_buffer[buffer_pos - 2] == 'd' &&
                 	input_buffer[buffer_pos - 1] == '\n')
                 {
-                    list_dir(all_files);
+                    //list_dir(all_files);
+                    bitmap_draw_string("okok\n", BLACK);
                     buffer_pos -= 2; // Adjust buffer position to account for replacement
                 }
 
@@ -465,7 +479,7 @@ void handle_keyboard_interrupt()
                 if (buffer_pos >= 1 &&
                     input_buffer[buffer_pos - 1] == '1' && servicePage == FALSE)
                 {
-                    printf("\nCONTINUED\n");
+                    bitmap_draw_string("\nCONTINUED\n", BLACK);
                     continueSetup = TRUE;
                     pageNumber = 1;
                     buffer_pos -= 1; // Adjust buffer position to account for replacement
@@ -474,7 +488,7 @@ void handle_keyboard_interrupt()
                 if (buffer_pos >= 1 &&
                     input_buffer[buffer_pos - 1] == '2' && servicePage == FALSE)
                 {
-                    printf("\nQUIT SETUP\n");
+                    bitmap_draw_string("\nQUIT SETUP\n", BLACK);
                     isInput = FALSE;
                     poweroff_sys = TRUE;
                     buffer_pos -= 1; // Adjust buffer position to account for replacement
@@ -485,9 +499,18 @@ void handle_keyboard_interrupt()
                     if (buffer_pos >= 1 &&
                     input_buffer[buffer_pos - 1] == '1')
                     {
-                        serviceAgreed = TRUE;
-                        pageNumber = 2;
-                        buffer_pos = 0; // Adjust buffer position to account for replacement
+                        pageNumber = 4;
+                        buffer_pos -= 1; // Adjust buffer position to account for replacement
+                    }
+                }
+
+                if(agreePage == TRUE)
+                {
+                    if (buffer_pos >= 1 &&
+                    input_buffer[buffer_pos - 1] == 'l')
+                    {
+                        pageNumber = 5;
+                        buffer_pos = 1; // Adjust buffer position to account for replacement
                     }
                 }
             }
@@ -605,8 +628,8 @@ void VDK_InterpretFile(struct RIFS_File e)
     itoa(e.time_created.mins, timeCreatedM, 10);
     itoa(e.time_created.secs, timeCreatedS, 10);
 
-    printf("Name ");
-    printf(e.name);
+    bitmap_draw_string("Name ", BLACK);
+    bitmap_draw_string(e.name, BLACK);
     printf("\n");
 
     printf("Time created ");
@@ -659,19 +682,31 @@ void VDK_ViewFile(struct RIFS_F e)
 
 void in_tos()
 {
-    printf("Last updated 9:00PM IST 8/23/2024\n\n");
-    printf("Introduction\n");
-    printf("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n");
-    printf("What you can and can't do with our software\n\n");
-    printf("When you download our software (This can include ViaOS, pre-installed software, and more), you aren't allowed to:\n");
-    printf("- Sell or give copies of ViaOS (This OS is literally free);\n- Make commercial use of ViaOS;\n- Sell it in blacklisted nations (This can include nations that have our OS banned and embargoed nations);\n- And use our software for illegal or malicious intent.\nOtherwise, you could customize your copy of ViaOS (But not distribute it or sell it), use it for projects, and basically anything (That complies with this TOS and laws of course)\n");
-    printf("\nPrivacy\n");
-    printf("Your privacy is important to us, that means we can't:\n");
-    printf("\n- Install spyware or malicious software on your PC or device;\n- Take your files away from you (Unless they're illegal or a TS breaker);\n- And anything else that breaks internet/data privacy laws in your country.\n");
-    printf("\nBut, when you break the TOS, we can:\n");
-    printf("- Take away your copy(ies) of ViaOS;\n- Get you arrested if we manage to find anything illegal (And what we mean by 'if we manage to find anything illegal' is that if we find proof of you having illegal activity. We can't look into your personal data);\n- And threaten to sue\n");
-    printf("\nConclusion\n");
-    printf("Your local law may give you rights that this TOS cannot change. If so, this TOS applies as far as the law allows.\nIf we have or find reason to, we can change and edit our TOS from time to time. These reasons can include: updates to our OS, our company practices, and our legal obligation. But those changes will be effective only to the extent that they can legally apply. In that case we'll try to inform you of the change before it takes effect.\n");
+        bitmap_draw_string("Last updated 9:00PM IST 8/23/2024\n\n", BLACK);
+        bitmap_draw_string(" \nIntroduction\n", BLACK);
+        bitmap_draw_string("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are under the age of consent or a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n", BLACK);
+        bitmap_draw_string("What you can and can't do with our software\n\n", BLACK);
+        bitmap_draw_string("When you download our software (This can include ViaOS, pre-installed software, and more), you aren't allowed to:\n", BLACK);
+        bitmap_draw_string("- Sell or give copies of ViaOS (This OS is literally free);\n", BLACK);
+        // stops
+}
+
+void in_tos2()
+{
+        bitmap_draw_string("- Make commercial use of ViaOS;\n- Sell it in blacklisted nations (This can include nations that have our OS banned and embargoed nations);\n- And use our software for illegal or malicious intent.\nOtherwise, you could customize your copy of ViaOS (But not distribute it or sell it), use it for projects, and basically anything (That complies with this TOS and laws of course)\n", BLACK);
+        bitmap_draw_string("\nPrivacy\n", BLACK);
+        bitmap_draw_string("Your privacy is important to us, that means we can't:\n", BLACK);
+        bitmap_draw_string("\n- Install spyware or malicious software on your PC or device;\n- Take your files away from you (Unless they're illegal or a TS breaker);\n", BLACK);
+        // stops
+}
+
+void in_tos3()
+{
+        bitmap_draw_string("- And anything else that breaks internet/data privacy laws in your country.\n", BLACK);
+        bitmap_draw_string("\nBut, when you break the TOS, we can:\n", BLACK);
+        bitmap_draw_string("- Take away your copy(ies) of ViaOS;\n- Get you arrested if we manage to find anything illegal (And what we mean by 'if we manage to find anything illegal' is that if we find proof of you having illegal activity. We can't look into your personal data);\n- And threaten to sue\n", BLACK);
+        bitmap_draw_string("\nConclusion\n", BLACK);
+        bitmap_draw_string("Your local law may give you rights that this TOS cannot change. if so, this TOS applies as far as the law allows.\nIf we have or find reason to, we can change and edit or TOS from time to time. In that case we'll try to inform you of the change before it takes effect.\n", BLACK);
 }
 
 void kmain()
@@ -683,6 +718,9 @@ void kmain()
     ata_init();
 	welcome();
 	enable_interrupts();
+
+    vga_graphics_init();
+    vga_graphics_clear_color(BLUE);
 
     const int DRIVE = ata_get_drive_by_model("VBOX HARDDISK");
     const uint32_t LBA = 0;
@@ -768,7 +806,7 @@ void kmain()
 
     if(strcmp(buf, "INSTALLED\n/\n") == 0)
     {
-        printf("Verified ViaOS Installation\n");
+        bitmap_draw_string("Verified ViaOS Installation\n", BLACK);
         isInstalled = TRUE;
     }
 
@@ -776,12 +814,10 @@ void kmain()
 
     if(isInstalled == TRUE)
     {
-        vga_graphics_init();
         vga_graphics_clear_color(WHITE);
         vga_graphics_fill_rect(20, 24, 50, 50, BLUE);
 
-        bitmap_draw_string("Test 1!", BLACK);
-        bitmap_draw_string(" Test 2!", BLACK);
+        //in_tos();
     }
 
     // write files to drive
@@ -866,24 +902,49 @@ void kmain()
     {
         if(isInstalled == FALSE && stop1 == FALSE)
         {
-            printf("\nViaOS 1.0 Installer\n");
-            printf("\nPress 1 to continue setup.\n");
-            printf("Press 2 to exit setup.\n");
+            bitmap_draw_string(" ViaOS 1.0 Installer\n", BLACK);
+            bitmap_draw_string("\nPress 1 to continue setup.\n", BLACK);
+            bitmap_draw_string("Press 2 to exit setup.\n", BLACK);
             stop1 = TRUE;
         }
 
         if(pageNumber == 1 && stop2 == FALSE)
         {
-            printf("TERMS OF SERVICE -- PRESS 1 TO AGREE.\n\n");
+            vga_graphics_clear_color(BLUE);
+            reset_text_position();
+            bitmap_draw_string("TERMS OF SERVICE -- PRESS 1 FOR NEXT PAGE.\n\n", BLACK);
             in_tos();
             servicePage = TRUE;
             stop2 = TRUE;
         }
 
+        if(pageNumber == 4 && stop6 == FALSE)
+        {
+            vga_graphics_clear_color(BLUE);
+            reset_text_position();
+            bitmap_draw_string("TERMS OF SERVICE -- PRESS L TO SEE NEXT.\n\n", BLACK);
+            in_tos2();
+            agreePage = TRUE;
+            stop6 = TRUE;
+        }
+
+        if(pageNumber == 5 && stop7 == FALSE)
+        {
+            vga_graphics_clear_color(BLUE);
+            reset_text_position();
+            bitmap_draw_string("TERMS OF SERVICE -- PRESS ANY KEY TO AGREE.\n\n", BLACK);
+            in_tos3();
+            agreePage2 = TRUE;
+            serviceAgreed = TRUE;
+            stop7 = TRUE;
+        }
+
         if(serviceAgreed == TRUE && pageNumber == 2 && stop3 == FALSE)
         {
-            terminal_initialize();
-            printf("Hi, We are installing your system...\n");
+            vga_graphics_clear_color(BLACK);
+            reset_text_position();
+
+            bitmap_draw_string(" Hi, We are installing your system...\n", WHITE);
 
             // boot.sys
             memset(buf, 0, sizeof(buf));
@@ -894,17 +955,15 @@ void kmain()
             memcpy(buf, &data2, sizeof(data2));
             ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
 
-            printf("We have successfully installed your system, Please reboot.\n");
+            bitmap_draw_string(" We have successfully installed your system, Please reboot.\n", WHITE);
 
             stop3 = TRUE;
         }
 
-        if(isInstalled == TRUE)
-        {
-            // this shit causes tearing: vga_graphics_clear_color(WHITE);
-            vga_graphics_draw_circle(50 + mx, 24 + my, 3, RED);
-            //bitmap_draw_char('e', 0, 0, BLACK);
-            //bitmap_draw_string("Hello World!", 0, 0, BLACK);
-        }
+        // if(stop5 == FALSE)
+        // {
+        //     //VDK_InterpretFile(all_files[0].metadata);
+        //     stop5 = TRUE;
+        // }
     }
 }

@@ -69,6 +69,10 @@ void vga_graphics_draw_line(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, 
 void vga_graphics_draw_rect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t color);
 void vga_graphics_fill_rect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t color);
 void vga_graphics_draw_circle(uint16_t x, uint16_t y, uint16_t radius, uint8_t color);
+void vga_graphics_scroll_up(uint16_t rows, uint8_t color);
+void vga_graphics_scroll_down(uint16_t rows, uint8_t color);
+void update_text_position();
+
 void bitmap_draw_string(const char *str, uint8_t color);
 void bitmap_putchar(char ch, uint8_t c);
 
