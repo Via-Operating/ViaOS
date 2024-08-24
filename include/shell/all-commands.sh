@@ -1,5 +1,5 @@
 # DON'T DELETE THIS! THIS IS AN IMPORTANT FILE!
-HEADER=viaSh.h
+HEADER=commands.h
 echo -n "" > $HEADER
 echo "// DON'T DELETE THIS FILE!" >> $HEADER
 echo "#ifndef __ALL_HEADERS__" >> $HEADER
