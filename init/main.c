@@ -671,7 +671,7 @@ void in_tos()
     printf("\nBut, when you break the TOS, we can:\n");
     printf("- Take away your copy(ies) of ViaOS;\n- Get you arrested if we manage to find anything illegal (And what we mean by 'if we manage to find anything illegal' is that if we find proof of you having illegal activity. We can't look into your personal data);\n- And threaten to sue\n");
     printf("\nConclusion\n");
-    printf("Your local law may give you rights that this TOS cannot change. if so, this TOS applies as far as the law allows.\nIf we have or find reason to, we can change and edit or TOS from time to time. These reasons can include: updates to our OS, our company practices, and our legal obligation. But those changes will be effective only to the extent that they can legally apply. In that case we'll try to inform you of the change before it takes effect.\n");
+    printf("Your local law may give you rights that this TOS cannot change. If so, this TOS applies as far as the law allows.\nIf we have or find reason to, we can change and edit our TOS from time to time. These reasons can include: updates to our OS, our company practices, and our legal obligation. But those changes will be effective only to the extent that they can legally apply. In that case we'll try to inform you of the change before it takes effect.\n");
 }
 
 void kmain()
