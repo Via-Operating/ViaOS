@@ -10,6 +10,7 @@
 #include <via/shell/term/viaSh/cd.h>
 #include <via/shell/term/viaSh/info.h>
 #include <via/shell/term/viaSh/shutdown.h>
+#include <via/shell/shell32/desktop/window.h>
 #include <via/via.h>
 
 #define MAX_FILENAME 255
@@ -808,8 +809,6 @@ void HandlePS2Mouse(uint8_t data)
     }
 }
 
-enum BOOL_T mouseClicked;
-
 void ProcessMousePacket()
 {
     if (!MousePacketReady) return;
@@ -831,15 +830,6 @@ void ProcessMousePacket()
         if (MousePacket[0] & PS2YOverflow){
             yOverflow = TRUE;
         }else yOverflow = FALSE;
-
-        if(MousePacket[0] & PS2Leftbutton)
-        {
-            mouseClicked = TRUE;
-        }
-        else
-        {
-            mouseClicked = FALSE;
-        }
 
         if (!xNegative){
             MousePosition.X += MousePacket[1] / 5;
@@ -876,6 +866,12 @@ void ProcessMousePacket()
         if (MousePosition.Y > VGA_MAX_HEIGHT-16) MousePosition.Y = VGA_MAX_HEIGHT-16;
 
         MousePacketReady = 0;
+}
+
+void sampleProc()
+{
+    reset_text_position();
+    bitmap_draw_string(" Sample title\n\n", BLACK);
 }
 
 void kmain()
@@ -1135,10 +1131,30 @@ void kmain()
             vga_graphics_clear_color(WHITE);
             HandlePS2Mouse(ioport_in(0x60));
             ProcessMousePacket();
-            if(mouseClicked == FALSE)
-                vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLACK);
-            else
-                vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLUE);
+            /* Left for when i finish double buffering. */
+            // reset_text_position();
+            // bitmap_draw_string(" Welcome to ViaOS. You are currently in VGA Mode 320x200. Thanks for choosing ViaOS.\n\n", BLACK);
+
+            // Create a Via32 API Window.
+
+            // Create a handle, a status and a WNDCLASS.
+            struct HAND hwnd;
+            struct WND32_STATUS stat;
+            struct WNDCLASS sample;
+
+            // Configure status and handle.
+            stat.x = 100;
+            stat.y = 50;
+
+            strcpy(hwnd.sName, " Hello World!");
+
+            sample.handle = hwnd;
+            sample.status = stat;
+
+            // Paint the window and pass the sample procedure.
+            WND32_Paint(sample, sampleProc);
+
+            vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLACK);
         }
 
         // if(stop5 == FALSE)

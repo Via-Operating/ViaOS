@@ -1,6 +1,6 @@
-	VDK release 0.2
+	VDK release 0.9.5
 
-These are the release notes for VDK version 0.2.  Read them carefully,
+These are the release notes for VDK version 0.9.5.  Read them carefully,
 as they tell you what this is all about, explain how to install the
 kernel, and what to do if something goes wrong. 
 
@@ -24,4 +24,11 @@ COMPILING the kernel:
    upgrade your compiler, remember to get the new binutils package too
    (for as/ld/nm and company)
 
- - do a "make" to create a kernel image without grub.
+ - do a "sudo make && sudo make iso" to create a kernel image without grub.
+
+USING the kernel:
+    
+    To use the VDK Kernel, Your OS must be Open-Source as of the GPL License. It is better off not better to use the VDK kernel
+    for your OS. It is unstable and better to use with ViaOS.
+
+CONFIGURING the kernel:
