@@ -684,7 +684,7 @@ void in_tos()
 {
         bitmap_draw_string("Last updated 9:00PM IST 8/23/2024\n\n", BLACK);
         bitmap_draw_string(" \nIntroduction\n", BLACK);
-        bitmap_draw_string("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are under the age of consent or a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n", BLACK);
+        bitmap_draw_string("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n", BLACK);
         bitmap_draw_string("What you can and can't do with our software\n\n", BLACK);
         bitmap_draw_string("When you download our software (This can include ViaOS, pre-installed software, and more), you aren't allowed to:\n", BLACK);
         bitmap_draw_string("- Sell or give copies of ViaOS (This OS is free);\n", BLACK);
