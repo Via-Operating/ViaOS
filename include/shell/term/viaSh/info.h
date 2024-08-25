@@ -98,4 +98,19 @@ void info()
     {
         printf("Yahaha! You found me!\n");
     }
+
+    printf("CPU: ");
+    printf(cpu);
+    printf("\n");
+
+    printf("GPU: ");
+    printf(gpu);
+    
+    printf("RAM: ");
+    printf(ram);
+    printf("\n");
+
+    printf("Storage: ");
+    printf(storage);
+    printf("\n");
 }
