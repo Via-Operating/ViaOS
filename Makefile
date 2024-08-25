@@ -14,6 +14,7 @@ all:
 	ld -m elf_i386 -T linker.ld -nostdlib -o build/mxos.bin build/gdt.o build/boot.o build/ata.o build/vga.o build/main.o
 
 clean:
+	# this line of code doesnt make fucking sense cuz the other line yeets the folder out of existence.
 	rm build/main.o build/boot.o build/gdt.o build/mxos.bin build/ata.o build/vga.o
 	rm -rf build
 

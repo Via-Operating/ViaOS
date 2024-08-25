@@ -25,7 +25,7 @@ int strcpy(char *dst, const char *src) {
 }
 
 enum BOOL_T poweroff_sys = FALSE;
-enum BOOL_T isInstalled = FALSE;
+enum BOOL_T isInstalled = TRUE;
 enum BOOL_T continueSetup = FALSE;
 enum BOOL_T isInput = TRUE;
 enum BOOL_T stop1 = FALSE;
@@ -187,10 +187,12 @@ void init()
 #include "../drivers/intel/intel_ps2keyboard/keyboard_map.h"
 #include "../drivers/independent/disk/ata/IDE.h"
 #include "../drivers/independent/graphics/vga/vga.h"
+//#include "../drivers/intel/intel_ps2mouse/mouse.h"
 
 extern void load_gdt();
 extern void keyboard_handler();
 extern void ata_handler();
+extern void m_handler();
 extern void load_idt(unsigned int* idt_address);
 extern void enable_interrupts();
 extern void disable_interrupts();
@@ -684,16 +686,16 @@ void in_tos()
 {
         bitmap_draw_string("Last updated 9:00PM IST 8/23/2024\n\n", BLACK);
         bitmap_draw_string(" \nIntroduction\n", BLACK);
-        bitmap_draw_string("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n", BLACK);
+        bitmap_draw_string("If you download or use our Operating System (ViaOS), or if you click to accept these Terms of Service, that means you agree to this TOS and will have to abide by our terms, so please read these terms **CAREFULLY**. If you are under the age of consent or a minor, it is recommended to have a parent/guardian read through these terms with you or have them explain it to you before accepting this.\n", BLACK);
         bitmap_draw_string("What you can and can't do with our software\n\n", BLACK);
         bitmap_draw_string("When you download our software (This can include ViaOS, pre-installed software, and more), you aren't allowed to:\n", BLACK);
-        bitmap_draw_string("- Sell or give copies of ViaOS (This OS is free);\n", BLACK);
+        bitmap_draw_string("- Sell or give copies of ViaOS (This OS is literally free);\n", BLACK);
         // stops
 }
 
 void in_tos2()
 {
-        bitmap_draw_string("- Make commercial use without a commercial license provided by one of our maintainers (For more, look at the ViaOS wiki on our GitHub repository in our commercial section);\n- Sell it in blacklisted nations (This can include nations that have our OS banned and embargoed nations);\n- And use our software for illegal or malicious intent.\nOtherwise, you could customize your copy of ViaOS (But not distribute it or sell it), use it for projects, and basically anything (That complies with this TOS and laws of course)\n", BLACK);
+        bitmap_draw_string("- Make commercial use of ViaOS;\n- Sell it in blacklisted nations (This can include nations that have our OS banned and embargoed nations);\n- And use our software for illegal or malicious intent.\nOtherwise, you could customize your copy of ViaOS (But not distribute it or sell it), use it for projects, and basically anything (That complies with this TOS and laws of course)\n", BLACK);
         bitmap_draw_string("\nPrivacy\n", BLACK);
         bitmap_draw_string("Your privacy is important to us, that means we can't:\n", BLACK);
         bitmap_draw_string("\n- Install spyware or malicious software on your PC or device;\n- Take your files away from you (Unless they're illegal or a TS breaker);\n", BLACK);
@@ -709,20 +711,188 @@ void in_tos3()
         bitmap_draw_string("Your local law may give you rights that this TOS cannot change. if so, this TOS applies as far as the law allows.\nIf we have or find reason to, we can change and edit or TOS from time to time. In that case we'll try to inform you of the change before it takes effect.\n", BLACK);
 }
 
+struct Point MousePosition;
+#define PS2Leftbutton 0b00000001
+#define PS2Middlebutton 0b00000010
+#define PS2Rightbutton 0b00000100
+#define PS2XSign 0b00010000
+#define PS2YSign 0b00100000
+#define PS2XOverflow 0b01000000
+#define PS2YOverflow 0b10000000
+
+void WaitMouse()
+{
+    uint64_t timeout = 100000;
+    while (timeout--)
+    {
+        if ((ioport_in(0x64) & 0b10) == 0)
+        {
+            return;
+        }
+    }
+}
+
+void WaitInput()
+{
+    uint64_t timeout = 100000;
+    while (timeout--)
+    {
+        if (ioport_in(0x64) & 0b1)
+        {
+            return;
+        }
+    }
+}
+
+uint8_t ReadMouse()
+{
+    WaitInput();
+    return ioport_in(0x60);
+}
+
+void WriteMouse(uint8_t value)
+{
+    WaitMouse();
+    ioport_out(0x64, 0xD4);
+    WaitMouse();
+    ioport_out(0x60, value);
+}
+
+void mouse_init()
+{
+    // Thanks Vule!
+    ioport_out(0x64, 0xA8);
+
+    WaitMouse();
+    ioport_out(0x64, 0x20);
+    WaitInput();
+    uint8_t status = ioport_in(0x60);
+    status |= 0b10;
+    WaitMouse();
+    ioport_out(0x64, 0x60);
+    WaitMouse();
+    ioport_out(0x60, status);
+
+    WriteMouse(0xF6);
+    ReadMouse();
+
+    WriteMouse(0xF4);
+    ReadMouse();
+}
+
+int MousePacketReady = 0;
+uint8_t MousePacket[4];
+uint8_t MouseCycle;
+
+void HandlePS2Mouse(uint8_t data)
+{
+
+    switch(MouseCycle){
+        case 0:
+            if (MousePacketReady) break;
+            if (data & 0b00001000 == 0) break;
+            MousePacket[0] = data;
+            MouseCycle++;
+            break;
+        case 1:
+            if (MousePacketReady) break;
+            MousePacket[1] = data;
+            MouseCycle++;
+            break;
+        case 2:
+            if (MousePacketReady) break;
+            MousePacket[2] = data;
+            MousePacketReady = 1;
+            MouseCycle = 0;
+            break;
+    }
+}
+
+enum BOOL_T mouseClicked;
+
+void ProcessMousePacket()
+{
+    if (!MousePacketReady) return;
+
+        enum BOOL_T xNegative, yNegative, xOverflow, yOverflow;
+
+        if (MousePacket[0] & PS2XSign){
+            xNegative = TRUE;
+        }else xNegative = FALSE;
+
+        if (MousePacket[0] & PS2YSign){
+            yNegative = TRUE;
+        }else yNegative = FALSE;
+
+        if (MousePacket[0] & PS2XOverflow){
+            xOverflow = TRUE;
+        }else xOverflow = FALSE;
+
+        if (MousePacket[0] & PS2YOverflow){
+            yOverflow = TRUE;
+        }else yOverflow = FALSE;
+
+        if(MousePacket[0] & PS2Leftbutton)
+        {
+            mouseClicked = TRUE;
+        }
+        else
+        {
+            mouseClicked = FALSE;
+        }
+
+        if (!xNegative){
+            MousePosition.X += MousePacket[1] / 5;
+            if (xOverflow){
+                MousePosition.X += 255;
+            }
+        } else
+        {
+            MousePacket[1] = 256 - MousePacket[1];
+            MousePosition.X -= MousePacket[1];
+            if (xOverflow){
+                MousePosition.X -= 255;
+            }
+        }
+
+        if (!yNegative){
+            MousePosition.Y -= MousePacket[2] / 5;
+            if (yOverflow){
+                MousePosition.Y -= 255;
+            }
+        } else
+        {
+            MousePacket[2] = 256 - MousePacket[2];
+            MousePosition.Y += MousePacket[2];
+            if (yOverflow){
+                MousePosition.Y += 255;
+            }
+        }
+
+        if (MousePosition.X < 0) MousePosition.X = 0;
+        if (MousePosition.X > VGA_MAX_WIDTH-8) MousePosition.X = VGA_MAX_WIDTH-8;
+        
+        if (MousePosition.Y < 0) MousePosition.Y = 0;
+        if (MousePosition.Y > VGA_MAX_HEIGHT-16) MousePosition.Y = VGA_MAX_HEIGHT-16;
+
+        MousePacketReady = 0;
+}
+
 void kmain()
 {
 	/* Initialize everything */
 	init();
 	init_idt();
-	kb_init();
+	//kb_init();
     ata_init();
+    mouse_init();
 	welcome();
 	enable_interrupts();
 
     vga_graphics_init();
     vga_graphics_clear_color(BLUE);
 
-    const int DRIVE = ata_get_drive_by_model("VBOX HARDDISK");
+    const int DRIVE = ata_get_drive_by_model("QEMU HARDDISK");
     const uint32_t LBA = 0;
     const uint8_t NO_OF_SECTORS = 1;
     char buf[ATA_SECTOR_SIZE] = {0};
@@ -823,13 +993,13 @@ void kmain()
     // write files to drive
 
     // boot.sys
-    // memset(buf, 0, sizeof(buf));
-    // memcpy(buf, &e, sizeof(e));
-    // ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, &e, sizeof(e));
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 1, (uint32_t)buf);
 
-    // memset(buf, 0, sizeof(buf));
-    // memcpy(buf, &data2, sizeof(data2));
-    // ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, &data2, sizeof(data2));
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 2, (uint32_t)buf);
 
     // welcome.txt
     memset(buf, 0, sizeof(buf));
@@ -841,13 +1011,13 @@ void kmain()
     ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 4, (uint32_t)buf);
 
     // desktop.cfg
-    // memset(buf, 0, sizeof(buf));
-    // memcpy(buf, &e3, sizeof(e3));
-    // ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 5, (uint32_t)buf);
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, &e3, sizeof(e3));
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 5, (uint32_t)buf);
 
-    // memset(buf, 0, sizeof(buf));
-    // memcpy(buf, &data3, sizeof(data3));
-    // ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 6, (uint32_t)buf);
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, &data3, sizeof(data3));
+    ide_write_sectors(DRIVE, NO_OF_SECTORS, LBA + 6, (uint32_t)buf);
 
     // write files to drive
 
@@ -859,7 +1029,7 @@ void kmain()
     // e.id = 29;
     // memcpy(&e, buf, sizeof(e));
 
-    // welcome.txt
+    //welcome.txt
     memset(buf, 0, sizeof(buf));
     ide_read_sectors(DRIVE, NO_OF_SECTORS, LBA + 3, (uint32_t)buf);
     e2.id = 99;
@@ -958,6 +1128,17 @@ void kmain()
             bitmap_draw_string(" We have successfully installed your system, Please reboot.\n", WHITE);
 
             stop3 = TRUE;
+        }
+
+        if(isInstalled == TRUE)
+        {
+            vga_graphics_clear_color(WHITE);
+            HandlePS2Mouse(ioport_in(0x60));
+            ProcessMousePacket();
+            if(mouseClicked == FALSE)
+                vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLACK);
+            else
+                vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLUE);
         }
 
         // if(stop5 == FALSE)

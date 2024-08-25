@@ -84,5 +84,6 @@ void VDK_ViewFile(struct RIFS_F e);
 
 void itoa(int num, char* str, int base);
 int strcmp(const char *s1, char *s2);
+void *memset(void *dst, char c, uint32_t n);
 
 #endif
