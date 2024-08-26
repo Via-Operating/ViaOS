@@ -11,6 +11,7 @@
 #include <via/shell/term/viaSh/info.h>
 #include <via/shell/term/viaSh/shutdown.h>
 #include <via/shell/shell32/desktop/window.h>
+#include <via/shell/shell32/accessories/notepad.h>
 #include <via/via.h>
 
 #define MAX_FILENAME 255
@@ -41,6 +42,7 @@ enum BOOL_T stop6 = FALSE;
 enum BOOL_T agreePage = FALSE;
 enum BOOL_T stop7 = FALSE;
 enum BOOL_T agreePage2 = FALSE;
+enum BOOL_T kbI = FALSE;
 
 int pageNumber = 0;
 int xBitMap = 0;
@@ -258,6 +260,7 @@ void init_idt()
 
     idt_set_entry(33, (unsigned int)keyboard_handler, IDT_INTERRUPT_GATE_32BIT);
     idt_set_entry(46, (unsigned int)ata_handler, IDT_INTERRUPT_GATE_32BIT);
+    //idt_set_entry(44, (unsigned int)m_handler, IDT_INTERRUPT_GATE_32BIT);
 
 	// ICW1
 	ioport_out(PIC1_COMMAND_PORT, 0x11);
@@ -311,6 +314,8 @@ static int ageUser_pos = 0;
 
 void handle_keyboard_interrupt()
 {
+	kbI = TRUE;
+
 	if(poweroff_sys == TRUE)
 	{
 		return;
@@ -868,12 +873,6 @@ void ProcessMousePacket()
         MousePacketReady = 0;
 }
 
-void sampleProc()
-{
-    reset_text_position();
-    bitmap_draw_string(" Sample title\n\n", BLACK);
-}
-
 void kmain()
 {
 	/* Initialize everything */
@@ -1131,33 +1130,23 @@ void kmain()
             memset(BACK_BUFFER, 0, 200 * 320);
             
             vga_graphics_clear_color(WHITE);
-            HandlePS2Mouse(ioport_in(0x60));
-            ProcessMousePacket();
+
+            if(kbI == FALSE)
+            {
+	            HandlePS2Mouse(ioport_in(0x60));
+	            ProcessMousePacket();
+        	}
+
+        	if(kbI == TRUE)
+        	{
+        		kbI == FALSE;
+        	}
             /* Left for when i finish double buffering. */
             // reset_text_position();
             // bitmap_draw_string(" Welcome to ViaOS. You are currently in VGA Mode 320x200. Thanks for choosing ViaOS.\n\n", BLACK);
 
-            // Create a Via32 API Window.
-
-            // Create a handle, a status and a WNDCLASS.
-            struct HAND hwnd;
-            struct WND32_STATUS stat;
-            struct WNDCLASS sample;
-
-            // Configure status and handle.
-            stat.x = 100;
-            stat.y = 50;
-
-            strcpy(hwnd.sName, " Sample Via32 Window");
-
-            sample.handle = hwnd;
-            sample.status = stat;
-
-            // Set window foreground
-            //AllowSetForeground(GREEN);
-
-            // Paint the window and pass the sample procedure.
-            WND32_Paint(sample, sampleProc);
+            NPinit();
+            NPdraw();
 
             vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLACK);
 
