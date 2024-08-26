@@ -1128,6 +1128,8 @@ void kmain()
 
         if(isInstalled == TRUE)
         {
+            memset(BACK_BUFFER, 0, 200 * 320);
+            
             vga_graphics_clear_color(WHITE);
             HandlePS2Mouse(ioport_in(0x60));
             ProcessMousePacket();
@@ -1146,15 +1148,20 @@ void kmain()
             stat.x = 100;
             stat.y = 50;
 
-            strcpy(hwnd.sName, " Hello World!");
+            strcpy(hwnd.sName, " Sample Via32 Window");
 
             sample.handle = hwnd;
             sample.status = stat;
+
+            // Set window foreground
+            //AllowSetForeground(GREEN);
 
             // Paint the window and pass the sample procedure.
             WND32_Paint(sample, sampleProc);
 
             vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLACK);
+
+            vga_swap_buffer();
         }
 
         // if(stop5 == FALSE)

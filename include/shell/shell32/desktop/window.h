@@ -21,6 +21,7 @@ typedef struct WNDCLASS
 	void (*wndproc)();
 };
 
+//void AllowSetForeground(enum VGA_COLOR_TYPE e);
 void WND32_Paint(struct WNDCLASS wndClass, void (*proc)());
 void PaintDesktop(struct WNDCLASS* wndClasses);
 
