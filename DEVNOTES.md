@@ -9,7 +9,7 @@ making community stuff, like webpage and wiki...
 
 ## - Theo
 
-edited wiki, time to do more ViaSh stuff!!!!!!!!!!!! glad to see this os become more usable
+edited wiki, time to do more ViaSh stuff!!!!!!!!!!!! glad to see this os become more usable. let's not port .net, no point
 
 ## - Kap
 i fucking hate everybody.
