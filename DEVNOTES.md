@@ -14,7 +14,7 @@ edited wiki, time to do more ViaSh stuff!!!!!!!!!!!! glad to see this os become 
 ## - Kap
 i fucking hate everybody.
 
-Jokes aside: Mouse driver done! Next? GUI stuff.
+Jokes aside: Double buffering done. Next? uhh... GUI?
 
 ## - Vincent
 [MASTER OF PUPPETS](https://open.spotify.com/track/2MuWTIM3b0YEAskbeeFE1i?si=POP0gB4nSY-stbqPH6Yt4w), I'M PULLING YOUR STRINGS!
