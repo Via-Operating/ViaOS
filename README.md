@@ -1,6 +1,14 @@
 # ViaOS
 An x86 Operating System built on the Via Dynamic Kernel (VDK) by The Via Operating Project. Via is designed for an open-sourced, free non-profit operating system designed for developers and casual use.
 
+# Downloads
+
+Please refer to [our new Sourceforge](https://sourceforge.net/projects/viaos/) for downloads, updates and more.
+
+[![Download ViaOS](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/viaos/files/latest/download)
+
+# Wiki
+
 Please refer to the [Wiki](https://github.com/Via-Operating/ViaOS/wiki) for all of the information.
 
 ## Wiki guide
