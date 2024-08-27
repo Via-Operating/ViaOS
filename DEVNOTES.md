@@ -13,7 +13,7 @@ edited wiki, time to do more ViaSh stuff!!!!!!!!!!!! glad to see this os become 
 ## - Kap
 i fucking hate everybody.
 
-Jokes aside: CAN SOMEBODY FUCKING FIX THE PS/2 MOUSE????? PLEASE??? anyways, im doing applications and the Via32 API rn.
+Jokes aside: I fixed the PS/2 Mouse driver finally! Working on apps and via32 api.
 
 ## - Vincent
 [MASTER OF PUPPETS](https://open.spotify.com/track/2MuWTIM3b0YEAskbeeFE1i?si=POP0gB4nSY-stbqPH6Yt4w), I'M PULLING YOUR STRINGS!
