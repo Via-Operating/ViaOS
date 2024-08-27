@@ -4,8 +4,7 @@ Please check this everyday
 
 ## - Brad
 
-making community stuff, like webpage and wiki...
-
+hi there
 
 ## - Theo
 
