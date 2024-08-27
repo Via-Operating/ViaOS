@@ -1,5 +1,5 @@
 // ViaOS
-// Kernel
+// VDK
 // GNU GPL 3.0 License, Read LICENSE.TXT
 
 #include <via/stdio.h>
@@ -11,7 +11,9 @@
 #include <via/shell/term/viaSh/info.h>
 #include <via/shell/term/viaSh/shutdown.h>
 #include <via/shell/shell32/desktop/window.h>
+#include <via/shell/shell32/desktop/taskbar.h>
 #include <via/shell/shell32/accessories/notepad.h>
+#include <via/shell/shell32/accessories/viaver.h>
 #include <via/via.h>
 
 #define MAX_FILENAME 255
@@ -49,6 +51,9 @@ int xBitMap = 0;
 
 uint16_t mx = 0;
 uint16_t my = 0;
+
+// TODO: Remove terminal functions, it's no longer needed. It's fully VGA now, although you can probably port these to VGA
+// graphics mode.
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) 
 {
@@ -717,6 +722,8 @@ void in_tos3()
         bitmap_draw_string("Your local law may give you rights that this TOS cannot change. if so, this TOS applies as far as the law allows.\nIf we have or find reason to, we can change and edit or TOS from time to time. In that case we'll try to inform you of the change before it takes effect.\n", BLACK);
 }
 
+// FIXME: Help, somebody please fix this horrendous mouse driver
+// Thanks Vule (x2)!
 struct Point MousePosition;
 #define PS2Leftbutton 0b00000001
 #define PS2Middlebutton 0b00000010
@@ -764,10 +771,23 @@ void WriteMouse(uint8_t value)
     ioport_out(0x60, value);
 }
 
+void set_mouse_rate(uint8_t rate) 
+{
+    uint8_t status;
+
+    ioport_out(0x60, 0xF3);
+    status = ReadMouse();
+
+    ioport_out(0x60, rate);
+    status = ReadMouse();
+}
+
 void mouse_init()
 {
     // Thanks Vule!
     ioport_out(0x64, 0xA8);
+
+    set_mouse_rate(10);
 
     WaitMouse();
     ioport_out(0x64, 0x20);
@@ -873,12 +893,18 @@ void ProcessMousePacket()
         MousePacketReady = 0;
 }
 
+void mouse_fricker()
+{
+
+}
+
 void kmain()
 {
 	/* Initialize everything */
 	init();
 	init_idt();
-	//kb_init();
+	if(isInstalled == FALSE)
+		kb_init();
     ata_init();
     mouse_init();
 	welcome();
@@ -887,7 +913,7 @@ void kmain()
     vga_graphics_init();
     vga_graphics_clear_color(BLUE);
 
-    const int DRIVE = ata_get_drive_by_model("QEMU HARDDISK");
+    const int DRIVE = ata_get_drive_by_model("QEMU HARDDISK"); // qemu on top
     const uint32_t LBA = 0;
     const uint8_t NO_OF_SECTORS = 1;
     char buf[ATA_SECTOR_SIZE] = {0};
@@ -1129,7 +1155,7 @@ void kmain()
         {
             memset(BACK_BUFFER, 0, 200 * 320);
             
-            vga_graphics_clear_color(WHITE);
+            vga_graphics_clear_color(BROWN);
 
             if(kbI == FALSE)
             {
@@ -1147,6 +1173,9 @@ void kmain()
 
             NPinit();
             NPdraw();
+
+            VRinit();
+            VRdraw();
 
             vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLACK);
 
