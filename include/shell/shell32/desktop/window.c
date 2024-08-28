@@ -15,8 +15,8 @@ void WND32_Paint(struct WNDCLASS wndClass, void (*proc)())
 	wndClass.WND32_COL = currentWNDC;
 	vga_graphics_fill_rect(wndClass.status.x, wndClass.status.y, wndClass.status.w, wndClass.status.h, currentWNDC);
 	set_text_position(wndClass.status.x, wndClass.status.y);
-	bitmap_draw_stringS(wndClass.handle.sName, BLACK, TRUE, wndClass.status.y);
-	vga_graphics_draw_line(wndClass.status.x, wndClass.status.y + 16, wndClass.status.x + wndClass.status.w, wndClass.status.y + 16, WHITE);
+	bitmap_draw_stringS(wndClass.handle.sName, BLACK, TRUE, wndClass.status.y + 4);
+	vga_graphics_draw_line(wndClass.status.x, wndClass.status.y + 16, wndClass.status.x + wndClass.status.w, wndClass.status.y + 16, BLACK);
 	vga_graphics_fill_rect(wndClass.status.x + wndClass.status.w - 10, wndClass.status.y, 10, 10, RED);
 	proc();
 }

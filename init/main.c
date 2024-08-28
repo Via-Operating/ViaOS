@@ -834,6 +834,8 @@ void HandlePS2Mouse(uint8_t data)
     }
 }
 
+enum BOOL_T bonzi = FALSE;
+
 void ProcessMousePacket()
 {
     if (!MousePacketReady) return;
@@ -855,6 +857,15 @@ void ProcessMousePacket()
         if (MousePacket[0] & PS2YOverflow){
             yOverflow = TRUE;
         }else yOverflow = FALSE;
+
+        if(MousePacket[0] & PS2Leftbutton)
+        {
+            bonzi = TRUE;
+        }
+        else
+        {
+            bonzi = FALSE;
+        }
 
         if (!xNegative){
             MousePosition.X += MousePacket[1] / 5;
@@ -906,7 +917,8 @@ void kmain()
 	if(isInstalled == FALSE)
 		kb_init();
     ata_init();
-    mouse_init();
+    if(isInstalled == TRUE)
+        mouse_init();
 	welcome();
 	enable_interrupts();
 
@@ -986,7 +998,7 @@ void kmain()
     e3.time_modified = exT;
     e3.time_accessed = exT;
     strcpy(e3.name, "desktop.cfg");
-    strcpy(data3, "NULL");
+    strcpy(data3, "USER: DEFAULTUSER0\n");
 
     desktopCFG.metadata = e3;
     strcpy(desktopCFG.data, data3);
@@ -1167,15 +1179,14 @@ void kmain()
         	{
         		kbI == FALSE;
         	}
-            /* Left for when i finish double buffering. */
-            // reset_text_position();
-            // bitmap_draw_string(" Welcome to ViaOS. You are currently in VGA Mode 320x200. Thanks for choosing ViaOS.\n\n", BLACK);
+            reset_text_position();
+            bitmap_draw_string(" Welcome to ViaOS. You are currently in \n VGA Mode 320x200. \n Thanks for choosing ViaOS.\n\n", BLACK);
 
             NPinit();
             NPdraw();
 
-            VRinit();
-            VRdraw();
+            //VRinit();
+            //VRdraw();
 
             vga_graphics_fill_rect(MousePosition.X, MousePosition.Y, 5, 5, BLACK);
 
