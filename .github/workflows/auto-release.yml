@@ -23,10 +23,13 @@ jobs:
         with:
           tag_name: "v${{ github.run_number }}"
           release_name: "Release ${{ github.run_number }}"
+          body: |
+            WARNING:
+            This is an automatically generated release that has been triggered by a new commit in the `build` folder. The code may be incomplete or may crash; this is not released by a human.
           draft: false
           prerelease: false
 
-      - name: Upload image
+      - name: Upload image to release
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
