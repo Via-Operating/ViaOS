@@ -1,0 +1,35 @@
+name: Release on Build Change
+
+on:
+  push:
+    paths:
+      - 'build/via.iso'
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create a Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "v${{ github.run_number }}"
+          release_name: "Release ${{ github.run_number }}"
+          draft: false
+          prerelease: false
+
+      - name: Upload image
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/via.iso
+          asset_name: via.iso
+          asset_content_type: application/octet-stream
