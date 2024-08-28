@@ -8,7 +8,7 @@ hi there
 
 ## - Theo
 
-edited wiki, time to do more ViaSh stuff!!!!!!!!!!!! glad to see this os become more usable. let's not port .net, no point
+edited wiki, time to do more ViaSh stuff!!!!!!!!!!!! glad to see this os become more usable. let's not port .net, no point. I made a basic downloads website
 
 ## - Kap
 i fucking hate everybody.
