@@ -13,7 +13,7 @@ edited wiki, time to do more ViaSh stuff!!!!!!!!!!!! glad to see this os become 
 ## - Kap
 i fucking hate everybody.
 
-Jokes aside: I am currently working on basic apps. Hopefully i can soon make the keyboard driver work again. My plan is to make DOOM work on this soon.
+Jokes aside: Made icon/image support. Working on some real shit rn 🔥
 
 ## - Vincent
 [MASTER OF PUPPETS](https://open.spotify.com/track/2MuWTIM3b0YEAskbeeFE1i?si=POP0gB4nSY-stbqPH6Yt4w), I'M PULLING YOUR STRINGS!
