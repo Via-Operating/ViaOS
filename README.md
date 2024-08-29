@@ -8,7 +8,9 @@ https://via-operating.github.io/
 
 Or you can use [our Sourceforge](https://sourceforge.net/projects/viaos/) for downloads, updates and more.
 
-[![Download ViaOS](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/viaos/files/latest/download)
+[![Download ViaOS](https://via-operating.github.io/files/images/ViaLogo.png)[https://via-operating.github.io/pages/downloads]
+
+[![Download ViaOS in Sourceforge](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/viaos/files/latest/download)
 
 # Wiki
 
